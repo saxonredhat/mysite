@@ -1,0 +1,96 @@
+from django.db import models
+from django.contrib.auth.models import AbstractBaseUser
+from django.utils.translation import gettext_lazy as _
+
+
+# Create your models here.
+MENU_TYPE = (
+    (1, '目录'),
+    (2, '菜单'),
+    (3, '按钮'),
+)
+
+
+class Menu(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    parent_menu = models.ForeignKey('self', on_delete=models.CASCADE)
+    menu_type = models.IntegerField(choices=MENU_TYPE)
+    url = models.CharField(max_length=200, null=True, blank=True)
+    description = models.CharField(max_length=200, null=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Permission(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    menu = models.OneToOneField(Menu, on_delete=models.CASCADE)
+    description = models.CharField(max_length=200, null=True)
+
+    def __str__(self):
+        return self.name
+
+
+class PermissionGroup(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    permission = models.ManyToManyField(Permission)
+    description = models.CharField(max_length=200, null=True)
+
+    def __str__(self):
+        return self.name
+
+# class Function(models.Model):
+#     name = models.CharField(max_length=50, unique=True)
+#     permission = models.OneToOneField(Permission, on_delete=models.CASCADE)
+
+
+class Role(models.Model):
+    name = models.CharField(max_length=200)
+    permission = models.ManyToManyField(Permission)
+    permission_group = models.ManyToManyField(PermissionGroup)
+    description = models.CharField(max_length=200, null=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Space(models.Model):
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
+
+
+class User(AbstractBaseUser):
+    name = models.CharField(max_length=200, unique=True)
+    password = models.CharField(max_length=200)
+    status = models.SmallIntegerField()
+
+    roles = models.ManyToManyField(Role)
+    is_staff = models.BooleanField(
+        _('staff status'),
+        default=False,
+        help_text=_('Designates whether the user can log into this admin site.'),
+    )
+    is_active = models.BooleanField(
+        _('active'),
+        default=True,
+        help_text=_(
+            'Designates whether this user should be treated as active. '
+            'Unselect this instead of deleting accounts.'
+        ),
+    )
+
+    spaces = models.ManyToManyField(Space)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    USERNAME_FIELD = 'name'
+
+    def has_perm(self, perm, obj=None):
+        return self.is_staff
+
+    def has_module_perms(self, app_label):
+        return self.is_staff
+
+    def __str__(self):
+        return self.name
