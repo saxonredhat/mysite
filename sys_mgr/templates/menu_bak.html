@@ -1,0 +1,12 @@
+<div class="static-menu">
+
+    {% for menu,submenu_list in menu_list.items %}
+        {{ menu }}<br>
+        {% for sub_menu in submenu_list %}
+            <a href="{{ sub_menu.url }}">
+                --{{ sub_menu.name }}
+            </a><br>
+        {% endfor %}
+    {% endfor %}
+
+</div>

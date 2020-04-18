@@ -1,1 +1,32 @@
-权限管理
+{% extends "table.html" %}
+{% load static %}
+{% block title %}权限管理{% endblock %}
+{% block content_header %}权限管理{% endblock %}
+{% block content_header_page1 %}主页{% endblock %}
+{% block content_header_page2 %}权限管理{% endblock %}
+{% block card_title %}权限管理{% endblock %}
+{% block card_title_component %}&nbsp;<button type="button" class="btn btn-success btn-sm"><ion-icon name="person-add"></ion-icon> 新增</button>{% endblock %}
+{% block card_body %}
+  <table id="example2" class="table table-bordered table-hover">
+    <thead>
+    <tr>
+      <th>权限名</th>
+      <th>URL</th>
+      <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for permission in permissions %}
+    <tr>
+        <td>{{ permission.name }}</td>
+        <td>{{ permission.url }}</td>
+        <td>
+            <button type="button" class="btn btn-primary btn-sm"><ion-icon name="information-circle"></ion-icon> 详情</button>
+            <button type="button" class="btn btn-success btn-sm"><ion-icon name="create"></ion-icon> 编辑</button>
+            <button type="button" class="btn btn-danger btn-sm"><ion-icon name="trash"></ion-icon> 删除</button>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

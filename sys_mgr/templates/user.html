@@ -1,1 +1,47 @@
-user 管理
+{% extends "table.html" %}
+{% load static %}
+{% block title %}用户管理{% endblock %}
+{% block content_header %}用户管理{% endblock %}
+{% block content_header_page1 %}主页{% endblock %}
+{% block content_header_page2 %}用户管理{% endblock %}
+{% block card_title %}用户管理{% endblock %}
+{% block card_title_component %}&nbsp;<button type="button" class="btn btn-success btn-sm"><ion-icon name="person-add"></ion-icon> 新增</button>{% endblock %}
+{% block card_body %}
+  <table id="example2" class="table table-bordered table-hover">
+    <thead>
+    <tr>
+      <th>用户名</th>
+      <th>密码</th>
+      <th>角色</th>
+      <th>状态</th>
+      <th>创建时间</th>
+      <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for user in users %}
+    <tr>
+        <td>{{ user.username }}</td>
+        <td>{{ user.password }}</td>
+        <td>{% for role in user.roles.all %}
+                <button type="button" class="btn btn-primary btn-sm"><ion-icon name="person"></ion-icon> {{ role.name }}</button>
+            {% endfor %}
+            </td>
+        <td>
+            {% if user.status == 1 %}
+            <ion-icon name="checkmark-circle" class="text-success"></ion-icon>
+            {% else %}
+            <ion-icon name="close-circle" class="text-danger"></ion-icon>
+            {% endif %}
+        </td>
+        <td>{{ user.created_at |date:"Y-m-d H:i:s"}}</td>
+        <td>
+            <button type="button" class="btn btn-primary btn-sm"><ion-icon name="information-circle"></ion-icon> 详情</button>
+            <button type="button" class="btn btn-success btn-sm"><ion-icon name="create"></ion-icon> 编辑</button>
+            <button type="button" class="btn btn-danger btn-sm"><ion-icon name="trash"></ion-icon> 删除</button>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

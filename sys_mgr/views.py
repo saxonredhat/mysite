@@ -1,7 +1,8 @@
 from django.shortcuts import HttpResponse, render, redirect
 from django.contrib.auth.decorators import login_required
+from django.views.generic import ListView
 from django.views import View
-from .models import User, Menu
+from .models import *
 import re
 
 class LoginRequiredMixin(object):
@@ -23,59 +24,66 @@ class LoginView(View):
             user = User.objects.get(username=username)
         except:
             user = None
-        #存在则、判断密码是否正确
         if user:
             if password == user.password:
-                # 密码正确则，获取用户对应的权限列表
+                request.session['user_id'] = user.id
                 _perm_url_list = user.get_perm_url_list()
-                request.session['perm_list'] = _perm_url_list
-                print(_perm_url_list)
-                #菜单列表写入到session
-
-                #循环获取子菜单
-                _menu_obj_list = []
+                request.session['perm_url_list'] = _perm_url_list
+                submenu_obj_list = []
                 for menu in Menu.objects.filter(parent_menu__isnull=False):
-                    _sub_menu_list = []
                     for perm_url in _perm_url_list:
                         if re.match("^"+perm_url+"$", menu.url):
-                            _menu_obj_list.append(menu.url)
-                            # 构建_sub_menu_obj
-                            #判断_sub_menu_list是否存在_menu_obj对应的名字
-                            #不存在构建_menu_obj对象，创建_sub_menu_list
-                            #存在取出对应的_menu_obj的_sub_menu_list append _sub_menu_obj
+                            submenu_obj_list.append(menu)
+                menu_list = {}
+                for submenu in submenu_obj_list:
+                    if submenu.parent_menu.name in menu_list.keys():
+                        exist_submenu_list = menu_list[submenu.parent_menu.name]
+                        exist_submenu_list.append({"name": submenu.name, "url": submenu.url})
+                    else:
+                        menu_list[submenu.parent_menu.name] = [{"name": submenu.name, "url": submenu.url}]
+                request.session['menu_list'] = menu_list
+                print("menu_list" + str(menu_list))
+                return render(request, 'index2.html')
+        return render(request, 'login.html', {'message': "账号不存在或密码错误!!!"})
 
-                            _sub_menu_obj = {}
-                print("拥有的菜单url:"+str(_menu_obj_list))
-                return render(request, 'main.html')
 
-        return render(request, 'login.html')
-
-
-class IndexView(LoginRequiredMixin,View):
+class IndexView(View):
     def get(self, request):
         return render(request, 'index.html')
 
 
-class RoleView(LoginRequiredMixin,View):
-    def get(self, request):
-        return render(request, 'role.html')
+class UserListView(ListView):
+    model = User
+    context_object_name = 'users'
+    template_name = "user.html"
+
+    def get_context_data(self, **kargs):
+        self.request.session['abc'] = 'test'
+        return super().get_context_data(**kargs)
 
 
-class UserView(LoginRequiredMixin,View):
-    def get(self, request):
-        return render(request, 'user.html')
+class RoleListView(ListView):
+    model = Role
+    context_object_name = 'roles'
+    template_name = "role.html"
 
 
-class MenuView(LoginRequiredMixin,View):
-    def get(self, request):
-        return render(request, 'menu.html')
+class PermissionListView(ListView):
+    model = Permission
+    context_object_name = 'permissions'
+    template_name = "permission.html"
 
 
-class PermissionView(LoginRequiredMixin,View):
-    def get(self, request):
-        return render(request, 'permission.html')
+class MenuListView(ListView):
+    model = Menu
+    context_object_name = 'menus'
+    template_name = "menu.html"
 
 
-class PermissionGroupView(LoginRequiredMixin,View):
-    def get(self, request):
-        return render(request, 'main.html')
+class SpaceListView(ListView):
+    model = Space
+    context_object_name = 'spaces'
+    template_name = "space.html"
+
+
+

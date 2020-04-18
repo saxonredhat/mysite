@@ -1,0 +1,28 @@
+<nav class="mt-2">
+    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+      <!-- Add icons to the links using the .nav-icon class
+           with font-awesome or any other icon font library -->
+      {% for menu,submenu_list in menu_list.items %}
+      <li class="nav-item has-treeview menu-open">
+        <a href="#" class="nav-link active">
+          <i class="nav-icon fas fa-tachometer-alt"></i>
+          <p>
+            {{ menu }}
+            <i class="right fas fa-angle-left"></i>
+          </p>
+        </a>
+        <ul class="nav nav-treeview">
+            {% for sub_menu in submenu_list %}
+              <li class="nav-item">
+                <a href="{{ sub_menu.url }}" class="nav-link {% if forloop.counter == 1 %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>{{ sub_menu.name }}</p>
+                </a>
+              </li>
+            {% endfor %}
+        </ul>
+      </li>
+      {% endfor %}
+
+    </ul>
+</nav>

@@ -1,15 +1,81 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Sys_mgr</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static "sys_mgr/plugins/fontawesome-free/css/all.min.css"  %}">
+  <!-- Ionicons -->
+  <!--
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  -->
+  <!-- icheck bootstrap -->
+  <link rel="stylesheet" href="{% static "sys_mgr/plugins/icheck-bootstrap/icheck-bootstrap.min.css"  %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static "sys_mgr/dist/css/adminlte.min.css"  %}">
 </head>
-<body>
-    <form action="/sys_mgr/login" method="post">
-        {% csrf_token %}
-        用户名：<input type="text" name="username"><br>
-        密码：<input type="text" name="password"><br>
-        <input type="submit" id="submit" name="submit" value="Login" />
-    </form>
+<body class="hold-transition login-page">
+<div class="login-box">
+  <div class="login-logo">
+    <b>树童运维管理平台</b>
+  </div>
+  <!-- /.login-logo -->
+  <div class="card">
+    <div class="card-body login-card-body">
+      <p class="login-box-msg"></p>
+
+      <form action="{%  url "sys_mgr:login" %}" method="post">
+          {% csrf_token %}
+          {{ message }}
+        <div class="input-group mb-3">
+          <input type="username" name="username" class="form-control" placeholder="用户名">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-envelope"></span>
+            </div>
+          </div>
+        </div>
+        <div class="input-group mb-3">
+          <input type="password" name="password" class="form-control" placeholder="密码">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-lock"></span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-8">
+            <div class="icheck-primary">
+              <input type="checkbox" id="remember">
+              <label for="remember">
+                记住我
+              </label>
+            </div>
+          </div>
+          <!-- /.col -->
+          <div class="col-4">
+            <button type="submit" class="btn btn-primary btn-block">登录</button>
+          </div>
+          <!-- /.col -->
+        </div>
+      </form>
+    </div>
+    <!-- /.login-card-body -->
+  </div>
+</div>
+<!-- /.login-box -->
+
+<!-- jQuery -->
+<script src="{% static "sys_mgr/plugins/jquery/jquery.min.js"  %}"></script>
+<!-- Bootstrap 4 -->
+<script src="{% static "sys_mgr/plugins/bootstrap/js/bootstrap.bundle.js"  %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static "sys_mgr/dist/js/adminlte.min.js"  %}"></script>
+
 </body>
 </html>

@@ -1,1 +1,35 @@
-role管理
+{% extends "table.html" %}
+{% load static %}
+{% block title %}角色管理{% endblock %}
+{% block content_header %}角色管理{% endblock %}
+{% block content_header_page1 %}主页{% endblock %}
+{% block content_header_page2 %}角色管理{% endblock %}
+{% block card_title %}角色管理{% endblock %}
+{% block card_title_component %}&nbsp;<button type="button" class="btn btn-success btn-sm"><ion-icon name="person-add"></ion-icon> 新增</button>{% endblock %}
+{% block card_body %}
+  <table id="example2" class="table table-bordered table-hover">
+    <thead>
+    <tr>
+      <th>角色名</th>
+      <th>包含的权限</th>
+      <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for role in roles %}
+    <tr>
+        <td>{{ role.name }}</td>
+        <td>
+            {% for perm in role.permissions.all %}
+                <button type="button" class="btn btn-primary btn-sm"> {{ perm.name }}</button>
+            {% endfor %}
+        </td>
+        <td>
+            <button type="button" class="btn btn-primary btn-sm"><ion-icon name="information-circle"></ion-icon> 修改权限</button>
+            <button type="button" class="btn btn-danger btn-sm"><ion-icon name="trash"></ion-icon> 删除</button>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

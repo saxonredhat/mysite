@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+{% block base_css %}
+    {{ block.super }}
+    <!-- DataTables -->
+  <link rel="stylesheet" href="{% static "sys_mgr/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css"  %}">
+  <link rel="stylesheet" href="{% static "sys_mgr/plugins/datatables-responsive/css/responsive.bootstrap4.min.css"  %}">
+{% endblock %}
+{% block title %}表模板{% endblock %}
+{% block content_header_page1 %}主页{% endblock %}
+{% block content_header_page2 %}表模板{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">{% block card_title %}DataTable table {% endblock %}</h3>
+              {% block card_title_component %}{% endblock %}
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+              {% block card_body %}
+                  DataTable table
+              {% endblock %}
+            </div>
+            <!-- /.card-body -->
+          </div>
+          <!-- /.card -->
+        </div>
+        <!-- /.col -->
+      </div>
+{% endblock %}
+{% block base_script %}
+    {{ block.super }}
+    <!-- DataTables -->
+    <script src="{% static "sys_mgr/plugins/datatables/jquery.dataTables.min.js"  %}"></script>
+    <script src="{% static "sys_mgr/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"  %}"></script>
+    <script src="{% static "sys_mgr/plugins/datatables-responsive/js/dataTables.responsive.min.js"  %}"></script>
+    <script src="{% static "sys_mgr/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"  %}"></script>
+    <script>
+      $(function () {
+        $('#tdata').DataTable({
+          "paging": true,
+          "lengthChange": false,
+          "searching": false,
+          "ordering": true,
+          "info": true,
+          "autoWidth": false,
+          "responsive": true,
+        });
+      });
+    </script>
+{% endblock %}
