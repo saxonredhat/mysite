@@ -12,6 +12,7 @@
 {% block content %}
     <div class="row">
         <div class="col-12">
+          {% block card %}
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">{% block card_title %}DataTable table {% endblock %}</h3>
@@ -26,6 +27,7 @@
             <!-- /.card-body -->
           </div>
           <!-- /.card -->
+          {% endblock %}
         </div>
         <!-- /.col -->
       </div>

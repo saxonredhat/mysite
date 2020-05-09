@@ -1,0 +1,140 @@
+{% extends "table.html" %}
+{% load static %}
+{% block title %}工单详情{% endblock %}
+{% block content_header %}工单详情{% endblock %}
+{% block content_header_page1 %}主页{% endblock %}
+{% block content_header_page2 %}工单详情{% endblock %}
+{% block card_title %}工单详情{% endblock %}
+{% load spacify %}
+{% block card_body %}
+  <table id="example2" class="table table-bordered table-hover">
+    <tbody>
+    <tr><td>工单类型</td><td>{{ object.type }}</td></tr>
+    <tr><td>标题</td><td>{{ object.title }}</td></tr>
+    <tr><td>空间</td><td>{{ object.space }}</td></tr>
+    <tr><td>项目名</td><td>{{ object.project }}</td></tr>
+    <tr><td>标签版本号</td><td>{{ object.vcs_tag }}</td></tr>
+    {% if object.service_conf %}
+    <tr><td>服务器配置</td><td>{{ object.service_conf|linebreaksbr|spacify }}</td></tr>
+    {% endif %}
+    {% if object.db_conf %}
+    <tr><td>数据库配置</td><td>{{ object.db_conf|linebreaksbr|spacify }}</td></tr>
+    {% endif %}
+    {% if object.other_conf %}
+    <tr><td>其他配置</td><td>{{ object.other_conf|linebreaksbr|spacify }}</td></tr>
+    {% endif %}
+    <tr><td>流程图</td><td>
+             <!-- The time line -->
+            <div class="timeline">
+              {% if object.create_user %}
+              <!-- timeline item -->
+              <div>
+                <i class="fas fa-user bg-green"></i>
+                <div class="timeline-item">
+                  <span class="time"><i class="fas fa-clock"></i> {{ object.created_at |date:"Y年m月d日 H时i分s秒"}}</span>
+                  <h3 class="timeline-header no-border"><a href="#">{{ object.create_user.chinese_name }}</a> 创建工单 <i class="fas fa-check-circle text-success"></i></h3>
+                </div>
+              </div>
+              {% endif %}
+              <!-- END timeline item -->
+
+              {% if object.audit_user %}
+              <!-- timeline item -->
+              <div>
+                {% if object.audited_at and object.status >= 11 %}
+                    <i class="fas fa-user bg-green"></i>
+                {% else %}
+                    <i class="fas fa-user bg-gray"></i>
+                {% endif %}
+                <div class="timeline-item">
+                    {% if object.audited_at and object.status >= 11 %}
+                      <span class="time"><i class="fas fa-clock"></i> {{ object.audited_at |date:"Y年m月d日 H时i分s秒"}}</span>
+                      <h3 class="timeline-header no-border"><a href="#">{{object.audit_user}}</a> 审核完成 <i class="fas fa-check-circle text-success"></i></h3>
+                    {% else %}
+                      <h3 class="timeline-header no-border"><a href="#">{{object.audit_user}}</a> 待审核 <i class="fas fa-clock text-warning"></i></h3>
+                    {% endif %}
+                    {% if object.audit_description %}
+                        <div class="timeline-body">
+                        {{ object.audit_description }}
+                        </div>
+                    {% endif %}
+                </div>
+              </div>
+              <!-- END timeline item -->
+              {% endif %}
+
+              <!-- timeline item -->
+              <div>
+                {% if object.executed_at and object.status >= 21 %}
+                    <i class="fas fa-user bg-green"></i>
+                {% else %}
+                    <i class="fas fa-user bg-gray"></i>
+                {% endif %}
+                <div class="timeline-item">
+                    {% if object.executed_at and object.status >= 21 %}
+                        <h3 class="timeline-header no-border"><a href="#">{{object.execute_user}}</a> 发布完成 <i class="fas fa-check-circle text-success"></i></h3>
+                    {% else %}
+                        <h3 class="timeline-header no-border"><a href="#">{{object.execute_user}}</a> 待发布 <i class="fas fa-clock text-warning"></i></h3>
+                    {% endif %}
+                    {% if object.execute_description %}
+                        <div class="timeline-body">
+                        {{ object.execute_description }}
+                        </div>
+                    {% endif %}
+                </div>
+              </div>
+              <!-- END timeline item -->
+
+              {% if object.test_user %}
+              <!-- timeline item -->
+              <div>
+                {% if object.tested_at and object.status >= 31 %}
+                    <i class="fas fa-user bg-green"></i>
+                {% else %}
+                    <i class="fas fa-user bg-gray"></i>
+                {% endif %}
+                <div class="timeline-item">
+                    {% if object.tested_at and object.status >= 31 %}
+                      <span class="time"><i class="fas fa-clock"></i> {{ object.tested_at |date:"Y年m月d日 H时i分s秒"}}</span>
+                      <h3 class="timeline-header no-border"><a href="#">{{object.test_user}}</a> 测试完成 <i class="fas fa-check-circle text-success"></i></h3>
+                    {% else %}
+                      <h3 class="timeline-header no-border"><a href="#">{{object.test_user}}</a> 待测试 <i class="fas fa-clock text-warning"></i></h3>
+                    {% endif %}
+                    {% if object.test_description %}
+                        <div class="timeline-body">
+                        {{ object.test_description }}
+                        </div>
+                    {% endif %}
+                </div>
+              </div>
+              <!-- END timeline item -->
+              {% endif %}
+    </td>
+    </tr>
+
+    <tr><td>状态</td><td>
+        {% if object.status == 0 %}
+            <button class="btn btn-primary">已创建</button>
+        {% elif object.status == 10 %}
+            <button class="btn btn-primary">待审核</button>
+        {% elif object.status == 11 %}
+            <button class="btn btn-primary">审核通过</button>
+        {% elif object.status == 12 %}
+            <button class="btn btn-primary">审核不通过</button>
+        {% elif object.status == 20 %}
+            <button class="btn btn-primary">待发布</button>
+        {% elif object.status == 21 %}
+            <button class="btn btn-primary">发布完成</button>
+        {% elif object.status == 30 %}
+            <button class="btn btn-primary">待测试</button>
+        {% elif object.status == 31 %}
+            <button class="btn btn-primary">完成</button>
+        {% elif object.status == 32 %}
+            <button class="btn btn-primary">测试不通过</button>
+        {% endif %}
+    </td></tr>
+
+    <tr><td>创建时间</td><td>{{ object.created_at |date:"Y年m月d日 H时i分s秒"}}</td></tr>
+    </tbody>
+  </table>
+{% endblock %}

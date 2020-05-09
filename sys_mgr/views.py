@@ -42,7 +42,6 @@ class LoginView(View):
                     else:
                         menu_list[submenu.parent_menu.name] = [{"name": submenu.name, "url": submenu.url}]
                 request.session['menu_list'] = menu_list
-                print("menu_list" + str(menu_list))
                 return render(request, 'index2.html')
         return render(request, 'login.html', {'message': "账号不存在或密码错误!!!"})
 
@@ -56,10 +55,6 @@ class UserListView(ListView):
     model = User
     context_object_name = 'users'
     template_name = "user.html"
-
-    def get_context_data(self, **kargs):
-        self.request.session['abc'] = 'test'
-        return super().get_context_data(**kargs)
 
 
 class RoleListView(ListView):

@@ -1,0 +1,153 @@
+{% extends "table.html" %}
+{% load static %}
+{% block title %}我的工单{% endblock %}
+{% block content_header %}我的工单{% endblock %}
+{% block content_header_page1 %}主页{% endblock %}
+{% block content_header_page2 %}我的工单{% endblock %}
+
+{% block card %}
+  {% for tickets in all_tickets %}
+      {% if tickets %}
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">
+          {% if forloop.counter == 1  %}
+              我的审核工单
+          {% elif forloop.counter == 2  %}
+              我的发布工单
+          {% elif forloop.counter == 3  %}
+              我的测试工单
+          {% endif %}
+          </h3>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+          <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+              <th>工单类型</th>
+              <th>标题</th>
+              <th>空间</th>
+              <th>项目名</th>
+              <th>标签版本号</th>
+              <th>测试人员</th>
+              <th>审核人员</th>
+              <th>执行人员</th>
+              <th>状态</th>
+              <th>创建时间</th>
+              <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for ticket in tickets %}
+
+            <tr>
+                <td>{{ ticket.type }}</td>
+                <td>{{ ticket.title }}</td>
+                <td>{{ ticket.space }}</td>
+                <td>{{ ticket.project }}</td>
+                <td>{{ ticket.vcs_tag }}</td>
+                <td>{{ ticket.test_user }}</td>
+                <td>{{ ticket.audit_user }}</td>
+                <td>{{ ticket.execute_user }}</td>
+                <td>{% if ticket.status == 0 %}
+                    <button class="btn btn-primary">已创建</button>
+                {% elif ticket.status == 10 %}
+                    <button class="btn btn-primary">待审核</button>
+                {% elif ticket.status == 11 %}
+                    <button class="btn btn-primary">审核通过</button>
+                {% elif ticket.status == 12 %}
+                    <button class="btn btn-primary">审核不通过</button>
+                {% elif ticket.status == 20 %}
+                    <button class="btn btn-primary">待发布</button>
+                {% elif ticket.status == 21 %}
+                    <button class="btn btn-primary">发布完成</button>
+                {% elif ticket.status == 30 %}
+                    <button class="btn btn-primary">待测试</button>
+                {% elif ticket.status == 31 %}
+                    <button class="btn btn-primary">测试通过</button>
+                {% elif ticket.status == 32 %}
+                    <button class="btn btn-primary">测试不通过</button>
+                {% endif %}
+                </td>
+
+                <td>{{ ticket.created_at |date:"Y年m月d日 H时i分"}}</td>
+                <td>
+                    <a class="btn btn-primary btn-sm" href="{% url "ticket:detail" ticket.id %}"><ion-icon name="information-circle"></ion-icon>详情</a>
+                    {% if ticket.status <= 10 %}
+                    <a class="btn btn-success btn-sm" href="{% url "ticket:update" ticket.id %}"><ion-icon name="create"></ion-icon>更新</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+      {% endif %}
+  {% endfor %}
+{% endblock %}
+{% block card_title %}我的工单{% endblock %}
+{% block card_body %}
+  <table id="example2" class="table table-bordered table-hover">
+    <thead>
+    <tr>
+      <th>工单类型</th>
+      <th>标题</th>
+      <th>空间</th>
+      <th>项目名</th>
+      <th>标签版本号</th>
+      <th>测试人员</th>
+      <th>审核人员</th>
+      <th>执行人员</th>
+      <th>状态</th>
+      <th>创建时间</th>
+      <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for ticket in tickets %}
+    <tr>
+        <td>{{ ticket.type }}</td>
+        <td>{{ ticket.title }}</td>
+        <td>{{ ticket.space }}</td>
+        <td>{{ ticket.project }}</td>
+        <td>{{ ticket.vcs_tag }}</td>
+        <td>{{ ticket.test_user }}</td>
+        <td>{{ ticket.audit_user }}</td>
+        <td>{{ ticket.execute_user }}</td>
+        <td>{% if ticket.status == 0 %}
+            <button class="btn btn-primary">已创建</button>
+        {% elif ticket.status == 10 %}
+            <button class="btn btn-primary">待审核</button>
+        {% elif ticket.status == 11 %}
+            <button class="btn btn-primary">审核通过</button>
+        {% elif ticket.status == 12 %}
+            <button class="btn btn-danger">审核不通过</button>
+        {% elif ticket.status == 20 %}
+            <button class="btn btn-primary">待发布</button>
+        {% elif ticket.status == 21 %}
+            <button class="btn btn-primary">发布完成</button>
+        {% elif ticket.status == 30 %}
+            <button class="btn btn-primary">待测试</button>
+        {% elif ticket.status == 31 %}
+            <button class="btn btn-success">完成</button>
+        {% elif ticket.status == 32 %}
+            <button class="btn btn-danger">测试不通过</button>
+        {% endif %}
+        </td>
+
+        <td>{{ ticket.created_at |date:"Y年m月d日 H时i分"}}</td>
+        <td>
+            <a class="btn btn-primary btn-sm" href="{% url "ticket:detail" ticket.id %}"><ion-icon name="information-circle"></ion-icon>详情</a>
+            {% if ticket.status <= 10 %}
+            <a class="btn btn-success btn-sm" href="{% url "ticket:update" ticket.id %}"><ion-icon name="create"></ion-icon>更新</a>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

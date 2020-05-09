@@ -9,4 +9,10 @@ register =Library()   # 必须命名为 register
 @register.inclusion_tag("sidebar_menu.html")
 def get_menu_styles(request):
     menu_list = request.session.get("menu_list")
-    return {"menu_list": menu_list}  # 会传值给上面的 rbac/menu.html中，此处类似于render的传值
+    request_url=request.path_info
+    menu_ative = ''
+    for menu,submenu_list in menu_list.items():
+        for sub_menu in submenu_list:
+            if request_url == sub_menu['url']:
+                menu_ative = menu
+    return {"menu_list": menu_list,"menu_ative":menu_ative, "request_url": request_url}  # 会传值给上面的 rbac/menu.html中，此处类似于render的传值

@@ -6,5 +6,8 @@ admin.site.register(User)
 admin.site.register(Role)
 admin.site.register(Permission)
 
+admin.site.register(Department)
+admin.site.register(Position)
+
 admin.site.register(Menu)
 admin.site.register(Space)

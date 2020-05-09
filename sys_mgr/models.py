@@ -3,13 +3,16 @@ from django.db import models
 
 class User(models.Model):
 	username = models.CharField(max_length=64, unique=True)
+	chinese_name = models.CharField(max_length=64,blank=True,null=True, verbose_name="中文名")
 	password = models.CharField(max_length=128)
 	roles = models.ManyToManyField("Role")
+	spaces = models.ManyToManyField("Space")
+	position = models.ManyToManyField("Position", verbose_name="职位")
 	status = models.SmallIntegerField()
 	created_at = models.DateTimeField(auto_now_add=True)
 
 	def __str__(self):
-		return self.username
+		return "{0}({1})".format(self.username, self.chinese_name)
 
 	def get_perm_url_list(self):
 		_perm_url_list=[]
@@ -20,6 +23,29 @@ class User(models.Model):
 
 	class Meta:
 		verbose_name = u"用户"
+		verbose_name_plural = verbose_name
+
+
+class Department(models.Model):
+	name = models.CharField(max_length=64, verbose_name="部门名", unique=True)
+
+	def __str__(self):
+		return self.name
+
+	class Meta:
+		verbose_name = u"部门"
+		verbose_name_plural = verbose_name
+
+
+class Position(models.Model):
+	name = models.CharField(max_length=64, verbose_name="职位名称", unique=True)
+	department = models.ForeignKey("Department", verbose_name="部门", on_delete=models.CASCADE)
+
+	def __str__(self):
+		return self.name
+
+	class Meta:
+		verbose_name = u"职位"
 		verbose_name_plural = verbose_name
 
 
@@ -51,6 +77,7 @@ class Menu(models.Model):
 	name = models.CharField(max_length=64)
 	url = models.CharField(max_length=128, null=True, blank=True)
 	parent_menu = models.ForeignKey("Menu", null=True, blank=True, on_delete=models.CASCADE)
+	icon_name = models.CharField(max_length=32, default='circle')
 	seq = models.IntegerField()
 
 	def __str__(self):
@@ -65,7 +92,6 @@ class Menu(models.Model):
 
 class Space(models.Model):
 	name = models.CharField(max_length=64)
-	users = models.ManyToManyField("User")
 
 	def __str__(self):
 		return self.name

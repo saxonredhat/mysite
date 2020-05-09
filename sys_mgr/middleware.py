@@ -17,8 +17,9 @@ class PermissionMiddleware(MiddlewareMixin):
             return redirect("/sys_mgr/login")
 
         perm_url_list = request.session.get("perm_url_list")
-        print('current_url:'+current_url)
-        print('perm_url_list:' + str(perm_url_list))
+        #print('current_url:'+current_url)
+        #print('current_url2:' + request.path_info)
+        #print('perm_url_list:' + str(perm_url_list))
         #校验权限
         for perm_url in perm_url_list:
             if re.match(perm_url, current_url):

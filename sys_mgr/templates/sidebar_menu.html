@@ -3,18 +3,19 @@
       <!-- Add icons to the links using the .nav-icon class
            with font-awesome or any other icon font library -->
       {% for menu,submenu_list in menu_list.items %}
-      <li class="nav-item has-treeview menu-open">
-        <a href="#" class="nav-link active">
-          <i class="nav-icon fas fa-tachometer-alt"></i>
+      <li class="nav-item has-treeview {% if menu == menu_ative %}menu-open{% endif %}">
+        <a href="#" class="nav-link">
+          <i class="nav-icon fas fa-circle"></i>
           <p>
             {{ menu }}
+
             <i class="right fas fa-angle-left"></i>
           </p>
         </a>
         <ul class="nav nav-treeview">
             {% for sub_menu in submenu_list %}
               <li class="nav-item">
-                <a href="{{ sub_menu.url }}" class="nav-link {% if forloop.counter == 1 %}active{% endif %}">
+                <a href="{{ sub_menu.url }}" class="nav-link {% if request_url == sub_menu.url %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>{{ sub_menu.name }}</p>
                 </a>
