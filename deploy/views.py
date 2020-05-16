@@ -132,10 +132,11 @@ class JobPlanCreateView(CreateView):
             else:
                 env = 'unknow'
             last_build_number = get_last_build_number(env, jenkins_job.job_name)
-            #判断构建状态
+            #构建job
             build_job_branch_tag(env, jenkins_job.job_name, self.object.vcs_tag)
             # 设置job 的状态为构建中
-            self.object.jenkins_build_number = last_build_number + 1
+            if last_build_number:
+                self.object.jenkins_build_number = last_build_number + 1
             self.object.job.status = 1
             self.object.job.save()
             _thread.start_new_thread(self.update_job_info, (env, jenkins_job.job_name))
@@ -148,13 +149,26 @@ class JobPlanCreateView(CreateView):
         # 设置job默认为失败
         self.object.status = 2
         _start_count = 0
+        last_build_number = get_last_build_number(space, job_name)
         while _start_count < 600:
-            if get_job_build_result(space, job_name, self.object.jenkins_build_number) == 'SUCCESS':
-                self.object.status = 1
-                break
-            elif get_job_build_result(space, job_name, self.object.jenkins_build_number) == 'FAILURE':
-                self.object.status = 2
-                break
+            if not self.object.jenkins_build_number and not last_build_number:
+                time.sleep(1)
+                last_build_number=get_last_build_number(space, job_name)
+            else:
+                if last_build_number:
+                    if get_job_build_result(space, job_name, last_build_number) == 'SUCCESS':
+                        self.object.status = 1
+                        break
+                    elif get_job_build_result(space, job_name, last_build_number) == 'FAILURE':
+                        self.object.status = 2
+                        break
+                else:
+                    if get_job_build_result(space, job_name, self.object.jenkins_build_number) == 'SUCCESS':
+                        self.object.status = 1
+                        break
+                    elif get_job_build_result(space, job_name, self.object.jenkins_build_number) == 'FAILURE':
+                        self.object.status = 2
+                        break
             _start_count += 1
             time.sleep(1)
 
