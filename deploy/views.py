@@ -75,7 +75,7 @@ class GetAllJobsProgress(View):
                     for job_plan in job_plans_queryset:
                         total_seconds += job_plan.duration/1000.0
                     average_seconds = total_seconds / 2
-                    print(last_job_plan_duration_seconds, average_seconds)
+                    average_seconds = 60 if average_seconds == 0 else average_seconds
                     estimate_progress = last_job_plan_duration_seconds / average_seconds * 0.5 * 100
                 else:
                     estimate_progress = last_job_plan_duration_seconds * 0.5
@@ -291,6 +291,7 @@ try:
         for job_plan in JobPlan.objects.filter(status=0):
             jenkins_job = JenkinsJob.objects.get(space=job_plan.job.space, service=job_plan.job.service)
             job_build_info=get_job_build_info(job_plan.job.space, jenkins_job.job_name, job_plan.jenkins_build_number)
+            print(job_build_info)
             result = job_build_info['result']
             if result:
                 #更新job_plan
@@ -298,8 +299,14 @@ try:
                     job_plan.status = 1
                 elif result == 'FAILURE':
                     job_plan.status = 2
-                fin
+                #完成时间
+                duration_seconds = job_plan.duration / 1000.0
+                job_plan.finished_at = job_plan.created_at + timezone.timedelta(seconds=duration_seconds)
+                job_plan.console_output = get_job_build_console_output(job_plan.job.space, jenkins_job.job_name, job_plan.jenkins_build_number)
+                job_plan.save()
                 #更新job
+                job_plan.job.status = 0
+                job_plan.job.save()
 
     register_events(scheduler)
     scheduler.start()
