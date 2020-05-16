@@ -1,0 +1,30 @@
+{% extends "table.html" %}
+{% load static %}
+{% block title %}基础列表{% endblock %}
+{% block content_header %}基础列表{% endblock %}
+{% block content_header_page1 %}主页{% endblock %}
+{% block content_header_page2 %}基础列表{% endblock %}
+{% block card_title %}基础列表{% endblock %}
+{% block card_body %}
+  基础表
+{% endblock %}
+{% block  base_script %}
+    {{ block.super }}
+    <script>
+      $(function (){
+          new Clipboard('.copy');
+          const Toast = Swal.mixin({
+              toast: true,
+              position: 'top',
+              showConfirmButton: false,
+              timer: 1000
+          });
+          $('.swalDefaultSuccess').click(function() {
+              Toast.fire({
+                icon: 'success',
+                title: '已复制到粘贴板.'
+              })
+            });
+          });
+    </script>
+{% endblock %}

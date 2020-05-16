@@ -1,0 +1,90 @@
+{% extends "form.html" %}
+{% load static %}
+{% block title %}工单管理{% endblock %}
+{% block content_header %}工单管理{% endblock %}
+{% block content_header_page1 %}主页{% endblock %}
+{% block content_header_page2 %}工单管理{% endblock %}
+{% block card_title %}工单管理{% endblock %}
+{% block card_title_component %}&nbsp;<button type="button" class="btn btn-success btn-sm"><ion-icon name="person-add"></ion-icon> 新增</button>{% endblock %}
+{% block form %}
+    <!-- form start -->
+    <form method="post" role="form">
+        {% csrf_token %}
+        <div class="card-body">
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="type">{{ form.type.label }}:</label>
+                {{ form.type }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="title">{{ form.title.label }}:</label>
+                {{ form.title }}
+            </div>
+             <div class="form-group">
+                <label class="control-label col-xs-1" for="space">{{ form.space.label }}:</label>
+                {{ form.space }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="project">{{ form.project.label }}:</label>
+                {{ form.project }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="vcs_tag">{{ form.vcs_tag.label }}:</label>
+                {{ form.vcs_tag }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="audit_user">{{ form.audit_user.label }}:</label>
+                {{ form.audit_user }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="execute_user">{{ form.execute_user.label }}:</label>
+                {{ form.execute_user }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="audit_user">{{ form.test_user.label }}:</label>
+                {{ form.test_user }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="service_conf">{{ form.service_conf.label }}:</label>
+                {{ form.service_conf }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="db_conf">{{ form.db_conf.label }}:</label>
+                {{ form.db_conf }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="other_conf">{{ form.other_conf.label }}:</label>
+                {{ form.other_conf }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="execute_description">{{ form.execute_description.label }}:</label>
+                {{ form.execute_description }}
+            </div>
+            <div class="form-group" style="display: none">
+                {{ form.status }}
+            </div>
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-primary" value="Submit" id="submit" >提交</button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block base_script %}
+    {{block.super}}
+    <script>
+        $("#submit").click(function(){
+            $("#id_type").attr("disabled",false);
+            $("#id_title").attr("disabled",false);
+            $("#id_space").attr("disabled",false);
+            $("#id_service").attr("disabled",false);
+            $("#id_vcs_tag").attr("disabled",false);
+            $("#id_audit_user").attr("disabled",false);
+            $("#id_execute_user").attr("disabled",false);
+            $("#id_test_user").attr("disabled",false);
+            $("#id_service_conf").attr("disabled",false);
+            $("#id_db_conf").attr("disabled",false);
+            $("#id_other_conf").attr("disabled",false);
+        });
+
+    </script>
+{% endblock %}

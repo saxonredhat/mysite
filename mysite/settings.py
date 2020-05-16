@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'sys_mgr.apps.SysMgrConfig',
+    'ticket.apps.TicketConfig',
+    'deploy.apps.DeployConfig',
+    'django_apscheduler',
 ]
 
 MIDDLEWARE = [
@@ -48,7 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-#    'sys_mgr.middleware.permission.PermissionMiddleware',
+    'sys_mgr.middleware.PermissionMiddleware',
 ]
 
 ROOT_URLCONF = 'mysite.urls'
@@ -56,7 +59,7 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'mysite', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -64,6 +67,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -109,9 +113,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-hans'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -124,9 +128,32 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
 
+SYSMGR_WHITE_URL = ('/admin/*', '/media/*', '/sys_mgr/login/*', '/sys_mgr/static/*', '/deploy/*', '/favicon.ico')
+
+#AUTH_USER_MODEL = 'sys_mgr.User'
 #AUTH_USER_MODEL = 'sys_mgr.User'
 #AUTHENTICATION_BACKENDS=('django.contrib.auth.backends.ModelBackend',)
 #AUTHENTICATION_BACKENDS = ('sys_mgr.backends.MyBackend',)
 #AUTH_USER_MODEL = 'sys_mgr.User'
 #PERMISSION_WHITE_URLS = ['/admin/*']
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')#即项目路径下的media文件夹，没有则自动创建
+MEDIA_URL = '/media/' #这个是在浏览器上访问该上传文件的url的前缀
+
+
+# Jenkins测试配置
+JENKINS_TEST_URL = 'http://tjenkins.shudoon.com/'
+JENKINS_TEST_USER = 'weidalian'
+JENKINS_TEST_PASS = 'sys1991419'
+# Jenkins生产配置
+JENKINS_PROD_URL = 'http://jenkins.shudoon.com/'
+JENKINS_PROD_USER = 'sheyinsong'
+JENKINS_PROD_PASS = 'sys1991419'
+
+# GIT配置
+GIT_HOST = "git.shudoon.com"
+GIT_PRIVATE_TOKEN = "65yMzoJwtq_YQZKZjX68"

@@ -8,9 +8,12 @@
 {% block card_title_component %}&nbsp;<button type="button" class="btn btn-success btn-sm"><ion-icon name="person-add"></ion-icon> 新增</button>{% endblock %}
 {% block form %}
     <!-- form start -->
-    <form method="post" role="form">
+    <form method="post" role="form" enctype="multipart/form-data" action="">
         {% csrf_token %}
         <div class="card-body">
+            <div class="form-group" style="display: none" >
+                {{ form.number }}
+            </div>
             <div class="form-group">
                 <label class="control-label col-xs-1" for="title">{{ form.type.label }}:</label>
                 {{ form.type }}
@@ -24,8 +27,8 @@
                 {{ form.space }}
             </div>
             <div class="form-group">
-                <label class="control-label col-xs-1" for="project">{{ form.project.label }}:</label>
-                {{ form.project }}
+                <label class="control-label col-xs-1" for="service">{{ form.service.label }}:</label>
+                {{ form.service }}
             </div>
             <div class="form-group">
                 <label class="control-label col-xs-1" for="vcs_tag">{{ form.vcs_tag.label }}:</label>
@@ -52,6 +55,10 @@
                 {{ form.db_conf }}
             </div>
             <div class="form-group">
+                <label class="control-label col-xs-1" for="db_file">{{ form.db_file.label }}:</label>
+                {{ form.db_file }}
+            </div>
+            <div class="form-group">
                 <label class="control-label col-xs-1" for="other_conf">{{ form.other_conf.label }}:</label>
                 {{ form.other_conf }}
             </div>
@@ -61,7 +68,85 @@
             </div>
         </div>
         <div class="card-footer">
-            <button type="submit" class="btn btn-primary" value="Submit" >提交</button>
+            <button type="submit" class="btn btn-primary" value="Submit" id="submit" >提交</button>
         </div>
     </form>
+{% endblock %}
+
+{% block  base_script %}
+    {{ block.super }}
+    <script src="{% static "sys_mgr/plugins/bs-custom-file-input/bs-custom-file-input.min.js" %}"></script>
+    <script>
+        $(document).ready(function () {
+          bsCustomFileInput.init();
+        });
+        $('#id_type').change(function(){
+            var ticket_type=$(this).children(":selected").text();
+            var service_id=$("#id_service").children(":selected").attr("value");
+            if(ticket_type != "业务服务"){
+                $("#id_vcs_tag option").remove();
+                $("#id_vcs_tag").attr("disabled",true);
+            }else{
+                $("#id_vcs_tag").attr("disabled",false);
+                $.ajax({
+                    url: "/deploy/project/tags?service_id="+service_id,
+                    dataType : "json",
+                    type: "get",
+                    success: function(data){
+                       $("#id_vcs_tag option").remove();
+                       if(data.errno ==0 ){
+                           for(var i=0; i<data.data.length;i++){
+                               if(i == 0 ){
+                                   $('#id_vcs_tag').append('<option value="'+data.data[i]+'" selected="selected">'+data.data[i]+'</option>');
+                               }else{
+                                   $('#id_vcs_tag').append('<option value="'+data.data[i]+'">'+data.data[i]+'</option>');
+                               }
+                           }
+                       }
+                    }
+                });
+            }
+        });
+        $('#id_service').change(function(){
+            var ticket_type=$('#id_type').children(":selected").text();
+            var service_id=$(this).children(":selected").attr("value");
+            if(ticket_type == "业务服务"){
+                $("#id_vcs_tag").attr("disabled",false);
+                $.ajax({
+                    url: "/deploy/project/tags?service_id="+service_id,
+                    dataType : "json",
+                    type: "get",
+                    success: function(data){
+                       $("#id_vcs_tag option").remove();
+                       if(data.errno ==0 ){
+                           for(var i=0; i<data.data.length;i++){
+                               if(i == 0 ){
+                                   $('#id_vcs_tag').append('<option value="'+data.data[i]+'" selected="selected">'+data.data[i]+'</option>');
+                               }else{
+                                   $('#id_vcs_tag').append('<option value="'+data.data[i]+'">'+data.data[i]+'</option>');
+                               }
+                           }
+                       }
+                    }
+                });
+            }else{
+                $("#id_vcs_tag option").remove();
+            }
+        });
+    </script>
+    <script>
+        $("#submit").click(function(){
+            $("#id_type").attr("disabled",false);
+            $("#id_title").attr("disabled",false);
+            $("#id_space").attr("disabled",false);
+            $("#id_service").attr("disabled",false);
+            $("#id_vcs_tag").attr("disabled",false);
+            $("#id_audit_user").attr("disabled",false);
+            $("#id_execute_user").attr("disabled",false);
+            $("#id_test_user").attr("disabled",false);
+            $("#id_service_conf").attr("disabled",false);
+            $("#id_db_conf").attr("disabled",false);
+            $("#id_other_conf").attr("disabled",false);
+        });
+    </script>
 {% endblock %}

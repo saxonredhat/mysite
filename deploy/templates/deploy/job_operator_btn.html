@@ -1,0 +1,25 @@
+{% if btn_type == 'job_plan_add' %}
+<a class="btn btn-dark btn-sm" href="#" style="display: {% if job.status == 1 %} display {% else %} none {% endif %}"
+   data="{% url "deploy:job_plan_add" job.id %}" id="id_build_btn_{{ job.id }}">
+    <ion-icon name="build"></ion-icon> 构建</a>
+
+    <a class="btn btn-primary btn-sm" href="{% url "deploy:job_plan_add" job.id %}"
+   style="display: {% if job.status != 1 %} display {% else %} none {% endif %}" id="id_build_active_btn_{{ job.id }}">
+    <ion-icon name="build"></ion-icon> 构建</a>
+
+{% elif btn_type == 'job_history' %}
+    <a class="btn btn-info btn-sm" href="{% url "deploy:job_plan_list" job.id %}">
+        <ion-icon name="recording"></ion-icon> 历史记录</a>
+{% elif btn_type == 'job_update' %}
+    <a class="btn btn-success btn-sm" href="{% url "deploy:job_update" job.id %}">
+        <ion-icon name="create"></ion-icon> 更新</a>
+{% elif btn_type == 'job_delete' %}
+    <a class="btn btn-danger btn-sm" href="{% url "deploy:job_delete" job.id %}" style="display: none">
+        <ion-icon name="close-circle"></ion-icon> 删除</a>
+{% elif btn_type == 'audit' %}
+    <a class="btn btn-primary btn-sm" href="{% url "deploy:audit" deploy.id %}">审核</a>
+{% elif btn_type == 'execute' %}
+    <a class="btn btn-primary btn-sm" href="{% url "deploy:execute" deploy.id %}">发布</a>
+{% elif btn_type == 'test' %}
+    <a class="btn btn-primary btn-sm" href="{% url "deploy:test" deploy.id %}">测试</a>
+{% endif %}

@@ -39,17 +39,8 @@
     <script src="{% static "sys_mgr/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"  %}"></script>
     <script src="{% static "sys_mgr/plugins/datatables-responsive/js/dataTables.responsive.min.js"  %}"></script>
     <script src="{% static "sys_mgr/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"  %}"></script>
-    <script>
-      $(function () {
-        $('#tdata').DataTable({
-          "paging": true,
-          "lengthChange": false,
-          "searching": false,
-          "ordering": true,
-          "info": true,
-          "autoWidth": false,
-          "responsive": true,
-        });
-      });
-    </script>
+    <!-- SweetAlert2 -->
+    <script src="{% static "sys_mgr/plugins/sweetalert2/sweetalert2.min.js"  %}"></script>
+    <!-- Toastr -->
+    <script src="{% static "sys_mgr/plugins/toastr/toastr.min.js"  %}"></script>
 {% endblock %}

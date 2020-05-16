@@ -1,0 +1,11 @@
+{% if table_type == 'table_header' %}
+    <th>发布名</th>
+    <th>空间</th>
+    <th>服务名</th>
+    <th>状态</th>
+    <th>操作</th>
+{% elif  table_type == 'table_body' %}
+    <td>{{ job.name }}</td>
+    <td>{{ job.space }}</td>
+    <td>{{ job.service }}</td>
+{% endif %}

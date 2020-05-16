@@ -1,0 +1,7 @@
+{% if job_plan.status == 0 %}
+    <button class="btn btn-primary btn-sm"><ion-icon name="reload-circle"></ion-icon>{{ job_plan.get_status_name }}</button>
+{% elif job_plan.status == 1 %}
+    <button class="btn btn-success btn-sm"><ion-icon name="checkmark-circle"></ion-icon>{{ job_plan.get_status_name }}</button>
+{% elif job_plan.status == 2 %}
+    <button class="btn btn-danger btn-sm"><ion-icon name="alert-circle"></ion-icon>{{ job_plan.get_status_name }}</button>
+{% endif %}

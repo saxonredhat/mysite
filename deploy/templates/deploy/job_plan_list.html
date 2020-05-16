@@ -1,27 +1,27 @@
 {% extends "base_list.html" %}
 {% load static %}
-{% block title %}工单列表{% endblock %}
+{% block title %}发布历史列表{% endblock %}
 
-{% block content_header %}工单列表{% endblock %}
+{% block content_header %}发布历史列表{% endblock %}
 {% block content_header_page1 %}主页{% endblock %}
-{% block content_header_page2 %}工单列表{% endblock %}
-{% block card_title %}工单列表{% endblock %}
+{% block content_header_page2 %}发布历史列表{% endblock %}
+{% block card_title %}{{ job.name }}发布历史列表{% endblock %}
 {% block card_body %}
   <table class="table table-bordered table-hover datatable-pagination">
     <thead>
     <tr>
-      {% include 'ticket/ticket_table.html' with table_type='table_header' %}
+      {% include 'deploy/job_plan_table.html' with table_type='table_header' %}
     </tr>
     </thead>
     <tbody>
-    {% for ticket in tickets %}
-    <tr class="{% if ticket.status == -1 %}table-danger{% endif %}">
-        {% include 'ticket/ticket_table.html' with table_type='table_body' ticket=ticket %}
+    {% for job_plan in job_plans %}
+    <tr>
+        {% include 'deploy/job_plan_table.html' with table_type='table_body' job_plan=job_plan %}
         <td>
-            {% include 'ticket/ticket_status_btn.html' with ticket=ticket %}
+            {% include 'deploy/job_plan_status_btn.html' with job_plan=job_plan %}
         </td>
         <td>
-            {% include 'ticket/ticket_operator_btn.html' with btn_type='detail' ticket=ticket %}
+            {% include 'deploy/job_plan_operator_btn.html' with btn_type='job_plan_detail' job_plan=job_plan %}
         </td>
     </tr>
     {% endfor %}
@@ -33,7 +33,7 @@
     {{ block.super }}
     <script>
         $('.datatable-pagination').DataTable({
-          "order": [[10,'desc'],[11,'asc']],
+          "order": [[7,'desc'],[9,'asc']],
           "paging": true,
           "lengthChange": false,
           "searching": true,

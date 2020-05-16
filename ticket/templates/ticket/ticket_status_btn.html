@@ -1,0 +1,23 @@
+{% if ticket.status == 0 %}
+    <button class="btn btn-secondary btn-sm">已创建</button>
+{% elif ticket.status == -1 %}
+    <button class="btn btn-danger btn-sm">作废</button>
+{% elif ticket.status == 10 %}
+    <button class="btn btn-warning btn-sm">待审核</button>
+{% elif ticket.status == 11 %}
+    <button class="btn btn-info btn-sm">审核通过</button>
+{% elif ticket.status == 12 %}
+    <button class="btn btn-danger btn-sm">审核不通过</button>
+{% elif ticket.status == 20 %}
+    <button class="btn btn-warning btn-sm">待发布</button>
+{% elif ticket.status == 21 %}
+    <button class="btn btn-info btn-sm">发布完成</button>
+{% elif ticket.status == 30 %}
+    <button class="btn btn-warning btn-sm">待测试</button>
+{% elif ticket.status == 31 %}
+    <button class="btn btn-info btn-sm">测试通过</button>
+{% elif ticket.status == 32 %}
+    <button class="btn btn-danger btn-sm">测试不通过</button>
+{% elif ticket.status == 40 %}
+    <button class="btn btn-success btn-sm">完成</button>
+{% endif %}

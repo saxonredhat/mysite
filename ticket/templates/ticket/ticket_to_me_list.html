@@ -1,4 +1,4 @@
-{% extends "table.html" %}
+{% extends "base_list.html" %}
 {% load static %}
 {% block title %}我的工单{% endblock %}
 {% block content_header %}我的工单{% endblock %}
@@ -12,76 +12,59 @@
         <div class="card-header">
           <h3 class="card-title">
           {% if forloop.counter == 1  %}
-              我的审核工单
+              所有工单
           {% elif forloop.counter == 2  %}
-              我的发布工单
+              待审核工单
           {% elif forloop.counter == 3  %}
-              我的测试工单
+              待发布工单
+          {% elif forloop.counter == 4  %}
+              待测试工单
           {% endif %}
           </h3>
         </div>
         <!-- /.card-header -->
         <div class="card-body">
-          <table class="table table-bordered table-hover">
+          <table class="table table-bordered table-hover datatable-pagination">
             <thead>
             <tr>
-              <th>工单类型</th>
-              <th>标题</th>
-              <th>空间</th>
-              <th>项目名</th>
-              <th>标签版本号</th>
-              <th>测试人员</th>
-              <th>审核人员</th>
-              <th>执行人员</th>
-              <th>状态</th>
-              <th>创建时间</th>
-              <th>操作</th>
+              {% include 'ticket/ticket_table.html' with table_type='table_header' %}
             </tr>
             </thead>
             <tbody>
             {% for ticket in tickets %}
 
-            <tr>
-                <td>{{ ticket.type }}</td>
-                <td>{{ ticket.title }}</td>
-                <td>{{ ticket.space }}</td>
-                <td>{{ ticket.project }}</td>
-                <td>{{ ticket.vcs_tag }}</td>
-                <td>{{ ticket.test_user }}</td>
-                <td>{{ ticket.audit_user }}</td>
-                <td>{{ ticket.execute_user }}</td>
-                <td>{% if ticket.status == 0 %}
-                    <button class="btn btn-primary">已创建</button>
-                {% elif ticket.status == 10 %}
-                    <button class="btn btn-primary">待审核</button>
-                {% elif ticket.status == 11 %}
-                    <button class="btn btn-primary">审核通过</button>
-                {% elif ticket.status == 12 %}
-                    <button class="btn btn-primary">审核不通过</button>
-                {% elif ticket.status == 20 %}
-                    <button class="btn btn-primary">待发布</button>
-                {% elif ticket.status == 21 %}
-                    <button class="btn btn-primary">发布完成</button>
-                {% elif ticket.status == 30 %}
-                    <button class="btn btn-primary">待测试</button>
-                {% elif ticket.status == 31 %}
-                    <button class="btn btn-primary">测试通过</button>
-                {% elif ticket.status == 32 %}
-                    <button class="btn btn-primary">测试不通过</button>
-                {% endif %}
-                </td>
-
-                <td>{{ ticket.created_at |date:"Y年m月d日 H时i分"}}</td>
+            <tr class="{% if ticket.status == -1 %}table-danger{% endif %}">
+                {% include 'ticket/ticket_table.html' with table_type='table_body' ticket=ticket %}
                 <td>
-                    <a class="btn btn-primary btn-sm" href="{% url "ticket:detail" ticket.id %}"><ion-icon name="information-circle"></ion-icon>详情</a>
-                    {% if ticket.status <= 10 %}
-                    <a class="btn btn-success btn-sm" href="{% url "ticket:update" ticket.id %}"><ion-icon name="create"></ion-icon>更新</a>
+                    {% include 'ticket/ticket_status_btn.html' with ticket=ticket %}
+                </td>
+                <td>
+                    {% if forloop.parentloop.counter == 1 %}
+                        {% include 'ticket/ticket_operator_btn.html' with btn_type='detail' ticket=ticket %}
+                        {% if ticket.status >= 0 and ticket.status <= 10 or ticket.status == 12 %}
+                            {% if current_user == ticket.create_user %}
+                                {% include 'ticket/ticket_operator_btn.html' with btn_type='update' ticket=ticket %}
+                                {% include 'ticket/ticket_operator_btn.html' with btn_type='delete' ticket=ticket %}
+                            {% endif %}
+                        {% endif %}
+                        {% if  ticket.status <= 20 and ticket.status >= 0 %}
+                            {% if current_user == ticket.create_user %}
+                                {% include 'ticket/ticket_operator_btn.html' with btn_type='cancel' ticket=ticket %}
+                            {% endif %}
+                        {% endif %}
+                    {% elif forloop.parentloop.counter == 2 %}
+                        {% include 'ticket/ticket_operator_btn.html' with btn_type='audit' ticket=ticket %}
+                    {% elif forloop.parentloop.counter == 3 %}
+                        {% include 'ticket/ticket_operator_btn.html' with btn_type='execute' ticket=ticket %}
+                    {% elif forloop.parentloop.counter == 4 %}
+                        {% include 'ticket/ticket_operator_btn.html' with btn_type='test' ticket=ticket %}
                     {% endif %}
                 </td>
             </tr>
             {% endfor %}
             </tbody>
-          </table>
+          </table
+              >
         </div>
         <!-- /.card-body -->
       </div>
@@ -89,65 +72,35 @@
       {% endif %}
   {% endfor %}
 {% endblock %}
-{% block card_title %}我的工单{% endblock %}
-{% block card_body %}
-  <table id="example2" class="table table-bordered table-hover">
-    <thead>
-    <tr>
-      <th>工单类型</th>
-      <th>标题</th>
-      <th>空间</th>
-      <th>项目名</th>
-      <th>标签版本号</th>
-      <th>测试人员</th>
-      <th>审核人员</th>
-      <th>执行人员</th>
-      <th>状态</th>
-      <th>创建时间</th>
-      <th>操作</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for ticket in tickets %}
-    <tr>
-        <td>{{ ticket.type }}</td>
-        <td>{{ ticket.title }}</td>
-        <td>{{ ticket.space }}</td>
-        <td>{{ ticket.project }}</td>
-        <td>{{ ticket.vcs_tag }}</td>
-        <td>{{ ticket.test_user }}</td>
-        <td>{{ ticket.audit_user }}</td>
-        <td>{{ ticket.execute_user }}</td>
-        <td>{% if ticket.status == 0 %}
-            <button class="btn btn-primary">已创建</button>
-        {% elif ticket.status == 10 %}
-            <button class="btn btn-primary">待审核</button>
-        {% elif ticket.status == 11 %}
-            <button class="btn btn-primary">审核通过</button>
-        {% elif ticket.status == 12 %}
-            <button class="btn btn-danger">审核不通过</button>
-        {% elif ticket.status == 20 %}
-            <button class="btn btn-primary">待发布</button>
-        {% elif ticket.status == 21 %}
-            <button class="btn btn-primary">发布完成</button>
-        {% elif ticket.status == 30 %}
-            <button class="btn btn-primary">待测试</button>
-        {% elif ticket.status == 31 %}
-            <button class="btn btn-success">完成</button>
-        {% elif ticket.status == 32 %}
-            <button class="btn btn-danger">测试不通过</button>
-        {% endif %}
-        </td>
 
-        <td>{{ ticket.created_at |date:"Y年m月d日 H时i分"}}</td>
-        <td>
-            <a class="btn btn-primary btn-sm" href="{% url "ticket:detail" ticket.id %}"><ion-icon name="information-circle"></ion-icon>详情</a>
-            {% if ticket.status <= 10 %}
-            <a class="btn btn-success btn-sm" href="{% url "ticket:update" ticket.id %}"><ion-icon name="create"></ion-icon>更新</a>
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
-    </tbody>
-  </table>
+{% block base_script %}
+    {{ block.super }}
+    <script>
+        $('.datatable-pagination').DataTable({
+          "order": [[10,'desc'],[11,'asc']],
+          "paging": true,
+          "lengthChange": false,
+          "searching": true,
+          "ordering": true,
+          "info": true,
+          "autoWidth": false,
+          "responsive": true,
+          "oLanguage": {
+              "sLengthMenu": "每页显示 _MENU_ 条记录",
+              "sZeroRecords": "对不起，查询不到任何相关数据",
+              "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录",
+              "sInfoEmtpy": "找不到相关数据",
+              "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+              "sProcessing": "正在加载中...",
+              "sSearch": "搜索",
+              "sUrl": "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+              "oPaginate": {
+                  "sFirst":    "第一页",
+                  "sPrevious": " 上一页 ",
+                  "sNext":     " 下一页 ",
+                  "sLast":     " 最后一页 "
+              }
+          }, //多语言配置
+        });
+    </script>
 {% endblock %}

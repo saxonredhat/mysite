@@ -1,29 +1,48 @@
 {% extends "table.html" %}
 {% load static %}
+{% load spacify %}
+{% load readmore %}
 {% block title %}工单详情{% endblock %}
 {% block content_header %}工单详情{% endblock %}
 {% block content_header_page1 %}主页{% endblock %}
 {% block content_header_page2 %}工单详情{% endblock %}
 {% block card_title %}工单详情{% endblock %}
-{% load spacify %}
 {% block card_body %}
-  <table id="example2" class="table table-bordered table-hover">
+  <table id="example2" class="table {% if ticket.status == -1  %}table-danger{% else %}table-bordered table-hover{% endif %}">
     <tbody>
+    <tr><td>工单编号</td><td>{{ object.number }} <i class="fas fa-copy copy swalDefaultSuccess" style="cursor: pointer;"
+ data-clipboard-text='{{ ticket.number }}'></i></td></tr>
     <tr><td>工单类型</td><td>{{ object.type }}</td></tr>
-    <tr><td>标题</td><td>{{ object.title }}</td></tr>
+    <tr><td>说明</td><td>{{ object.title }}</td></tr>
     <tr><td>空间</td><td>{{ object.space }}</td></tr>
-    <tr><td>项目名</td><td>{{ object.project }}</td></tr>
+    <tr><td>服务名</td><td>{{ object.service }}</td></tr>
+    {% if object.service.project.repository.vcs_url %}
+        <tr><td>版本库地址</td><td><a href="{{ object.service.project.repository.vcs_url }}">{{ object.service.project.repository.vcs_url }}</a></td></tr>
+    {% endif %}
+    {% if object.vcs_tag %}
     <tr><td>标签版本号</td><td>{{ object.vcs_tag }}</td></tr>
+    {% endif %}
     {% if object.service_conf %}
-    <tr><td>服务器配置</td><td>{{ object.service_conf|linebreaksbr|spacify }}</td></tr>
+    <tr><td>服务器配置</td><td>{{ object.service_conf|linebreaksbr|spacify|readmore:15 }}</td></tr>
     {% endif %}
     {% if object.db_conf %}
-    <tr><td>数据库配置</td><td>{{ object.db_conf|linebreaksbr|spacify }}</td></tr>
+    <tr><td>数据库配置</td><td>{{ object.db_conf|linebreaksbr|spacify|readmore:15 }}</td></tr>
     {% endif %}
     {% if object.other_conf %}
-    <tr><td>其他配置</td><td>{{ object.other_conf|linebreaksbr|spacify }}</td></tr>
+    <tr><td>其他配置</td><td>{{ object.other_conf|linebreaksbr|spacify|readmore:15 }}</td></tr>
     {% endif %}
-    <tr><td>流程图</td><td>
+    {% if object.db_file %}
+        <tr><td>数据库升级文件</td>
+            <td>
+                <div class="form-group">
+                    <button type="button" class="btn btn-success" id="btn_db_file" data-toggle="modal" data-target="#modal-xl" >{{ object.db_file }}</button>
+                    <a type="button" class="btn btn-primary" id="btn_db_file" href="/media/{{ object.db_file }}" >下载</a>
+                </div>
+            </td>
+        </tr>
+    {% endif %}
+    <tr><td>流程图</td>
+        <td>
              <!-- The time line -->
             <div class="timeline">
               {% if object.create_user %}
@@ -32,7 +51,7 @@
                 <i class="fas fa-user bg-green"></i>
                 <div class="timeline-item">
                   <span class="time"><i class="fas fa-clock"></i> {{ object.created_at |date:"Y年m月d日 H时i分s秒"}}</span>
-                  <h3 class="timeline-header no-border"><a href="#">{{ object.create_user.chinese_name }}</a> 创建工单 <i class="fas fa-check-circle text-success"></i></h3>
+                  <h3 class="timeline-header no-border"><a href="#">{{ object.create_user.chinese_name }}</a> <i class="fas fa-check-circle text-success"></i> 创建工单 </h3>
                 </div>
               </div>
               {% endif %}
@@ -41,17 +60,25 @@
               {% if object.audit_user %}
               <!-- timeline item -->
               <div>
-                {% if object.audited_at and object.status >= 11 %}
+                {% if object.audited_at %}
                     <i class="fas fa-user bg-green"></i>
                 {% else %}
                     <i class="fas fa-user bg-gray"></i>
                 {% endif %}
                 <div class="timeline-item">
-                    {% if object.audited_at and object.status >= 11 %}
+                    {% if object.audited_at %}
                       <span class="time"><i class="fas fa-clock"></i> {{ object.audited_at |date:"Y年m月d日 H时i分s秒"}}</span>
-                      <h3 class="timeline-header no-border"><a href="#">{{object.audit_user}}</a> 审核完成 <i class="fas fa-check-circle text-success"></i></h3>
+                      <h3 class="timeline-header no-border"><a href="#">{{object.audit_user}}</a> <i class="fas fa-check-circle text-success"></i> 审核完成
+                      (
+                      {% if object.status == 12 %}
+                          不通过
+                      {% else %}
+                          通过
+                      {% endif %}
+                      )
+                      </h3>
                     {% else %}
-                      <h3 class="timeline-header no-border"><a href="#">{{object.audit_user}}</a> 待审核 <i class="fas fa-clock text-warning"></i></h3>
+                      <h3 class="timeline-header no-border"><a href="#">{{object.audit_user}}</a> <i class="fas fa-clock text-warning"></i> 待审核 </h3>
                     {% endif %}
                     {% if object.audit_description %}
                         <div class="timeline-body">
@@ -65,16 +92,17 @@
 
               <!-- timeline item -->
               <div>
-                {% if object.executed_at and object.status >= 21 %}
+                {% if object.executed_at %}
                     <i class="fas fa-user bg-green"></i>
                 {% else %}
                     <i class="fas fa-user bg-gray"></i>
                 {% endif %}
                 <div class="timeline-item">
-                    {% if object.executed_at and object.status >= 21 %}
-                        <h3 class="timeline-header no-border"><a href="#">{{object.execute_user}}</a> 发布完成 <i class="fas fa-check-circle text-success"></i></h3>
+                    {% if object.executed_at %}
+                        <span class="time"><i class="fas fa-clock"></i> {{ object.executed_at |date:"Y年m月d日 H时i分s秒"}}</span>
+                        <h3 class="timeline-header no-border"><a href="#">{{object.execute_user}}</a> <i class="fas fa-check-circle text-success"></i> 发布完成 ( 成功 ) </h3>
                     {% else %}
-                        <h3 class="timeline-header no-border"><a href="#">{{object.execute_user}}</a> 待发布 <i class="fas fa-clock text-warning"></i></h3>
+                        <h3 class="timeline-header no-border"><a href="#">{{object.execute_user}}</a> <i class="fas fa-clock text-warning"></i> 待发布 </h3>
                     {% endif %}
                     {% if object.execute_description %}
                         <div class="timeline-body">
@@ -88,17 +116,25 @@
               {% if object.test_user %}
               <!-- timeline item -->
               <div>
-                {% if object.tested_at and object.status >= 31 %}
+                {% if object.tested_at %}
                     <i class="fas fa-user bg-green"></i>
                 {% else %}
                     <i class="fas fa-user bg-gray"></i>
                 {% endif %}
                 <div class="timeline-item">
-                    {% if object.tested_at and object.status >= 31 %}
+                    {% if object.tested_at %}
                       <span class="time"><i class="fas fa-clock"></i> {{ object.tested_at |date:"Y年m月d日 H时i分s秒"}}</span>
-                      <h3 class="timeline-header no-border"><a href="#">{{object.test_user}}</a> 测试完成 <i class="fas fa-check-circle text-success"></i></h3>
+                      <h3 class="timeline-header no-border"><a href="#">{{object.test_user}}</a> <i class="fas fa-check-circle text-success"></i> 测试完成
+                      (
+                      {% if object.status == 32 %}
+                          不通过
+                      {% else %}
+                          通过
+                      {% endif %}
+                      )
+                      </h3>
                     {% else %}
-                      <h3 class="timeline-header no-border"><a href="#">{{object.test_user}}</a> 待测试 <i class="fas fa-clock text-warning"></i></h3>
+                      <h3 class="timeline-header no-border"><a href="#">{{object.test_user}}</a> <i class="fas fa-clock text-warning"></i> 待测试 </h3>
                     {% endif %}
                     {% if object.test_description %}
                         <div class="timeline-body">
@@ -109,32 +145,71 @@
               </div>
               <!-- END timeline item -->
               {% endif %}
-    </td>
+
+              <div>
+                {% if object.finished_at %}
+                    <i class="fas fa-check-circle bg-green"></i>
+                    <div class="timeline-item">
+                        <span class="time"><i class="fas fa-clock"></i>
+                            {{ object.finished_at |date:"Y年m月d日 H时i分s秒"}}
+                        </span>
+                        <h3 class="timeline-header no-border"><i class="fas fa-check-circle text-success"></i> 工单完成 </h3>
+                    </div>
+                {% else %}
+                    <i class="fas fa-clock bg-gray"></i>
+                {% endif %}
+              </div>
+        </td>
     </tr>
 
-    <tr><td>状态</td><td>
-        {% if object.status == 0 %}
-            <button class="btn btn-primary">已创建</button>
-        {% elif object.status == 10 %}
-            <button class="btn btn-primary">待审核</button>
-        {% elif object.status == 11 %}
-            <button class="btn btn-primary">审核通过</button>
-        {% elif object.status == 12 %}
-            <button class="btn btn-primary">审核不通过</button>
-        {% elif object.status == 20 %}
-            <button class="btn btn-primary">待发布</button>
-        {% elif object.status == 21 %}
-            <button class="btn btn-primary">发布完成</button>
-        {% elif object.status == 30 %}
-            <button class="btn btn-primary">待测试</button>
-        {% elif object.status == 31 %}
-            <button class="btn btn-primary">完成</button>
-        {% elif object.status == 32 %}
-            <button class="btn btn-primary">测试不通过</button>
-        {% endif %}
-    </td></tr>
-
-    <tr><td>创建时间</td><td>{{ object.created_at |date:"Y年m月d日 H时i分s秒"}}</td></tr>
+    <tr>
+        <td>状态</td>
+        <td>
+            {% include 'ticket/ticket_status_btn.html' with ticket=object %}
+        </td>
+    </tr>
+    <!--
+        <tr><td>创建时间</td><td>{{ object.created_at |date:"Y年m月d日 H时i分s秒"}}</td></tr>
+    -->
     </tbody>
   </table>
 {% endblock %}
+
+{% block modal %}
+    {% include 'ticket/ticket_modal.html' %}
+{% endblock %}
+
+{% block base_script %}
+    {{ block.super }}
+    <script>
+    $(function () {
+        new Clipboard('.copy');
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 1000
+        });
+        $('.swalDefaultSuccess').click(function () {
+            Toast.fire({
+                icon: 'success',
+                title: '已复制到粘贴板.'
+            })
+        });
+    });
+    $("#btn_db_file").click(function(){
+      $.ajax({
+          url: "/media/{{ ticket.db_file }}",
+          success: function(result,status,request){
+              $("#model_title").html("{{ ticket.db_file }}");
+              contentsize = request.getResponseHeader("Content-Length") /1024/1024;
+              if(contentsize>1){
+                  $("#modal_content").html("文件内容超过1M不支持预览，请下载！");
+              }else{
+                  $("#modal_content").html(result.replace(/(?:\r\n|\r|\n)/g, '<br>').replace(/ /g,'\u00a0'));
+              }
+      }});
+    });
+    </script>
+{% endblock %}
+

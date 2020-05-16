@@ -1,13 +1,12 @@
-{% extends "base_list.html" %}
+{% extends "table.html" %}
 {% load static %}
 {% block title %}工单列表{% endblock %}
-
 {% block content_header %}工单列表{% endblock %}
 {% block content_header_page1 %}主页{% endblock %}
 {% block content_header_page2 %}工单列表{% endblock %}
 {% block card_title %}工单列表{% endblock %}
 {% block card_body %}
-  <table class="table table-bordered table-hover datatable-pagination">
+  <table id="tickets" class="table table-bordered table-hover">
     <thead>
     <tr>
       {% include 'ticket/ticket_table.html' with table_type='table_header' %}
@@ -18,7 +17,7 @@
     <tr class="{% if ticket.status == -1 %}table-danger{% endif %}">
         {% include 'ticket/ticket_table.html' with table_type='table_body' ticket=ticket %}
         <td>
-            {% include 'ticket/ticket_status_btn.html' with ticket=ticket %}
+            {% include 'ticket/ticket_status_btn.html' %}
         </td>
         <td>
             {% include 'ticket/ticket_operator_btn.html' with btn_type='detail' ticket=ticket %}
@@ -28,11 +27,25 @@
     </tbody>
   </table>
 {% endblock %}
-
-{% block base_script %}
+{% block  base_script %}
     {{ block.super }}
     <script>
-        $('.datatable-pagination').DataTable({
+      $(function (){
+        new Clipboard('.copy');
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top',
+          showConfirmButton: false,
+          timer: 1000
+        });
+
+        $('.swalDefaultSuccess').click(function() {
+          Toast.fire({
+            icon: 'success',
+            title: '已复制到粘贴板.'
+          })
+        });
+        $('.tickets').DataTable({
           "order": [[10,'desc'],[11,'asc']],
           "paging": true,
           "lengthChange": false,
@@ -58,5 +71,6 @@
               }
           }, //多语言配置
         });
+      });
     </script>
 {% endblock %}

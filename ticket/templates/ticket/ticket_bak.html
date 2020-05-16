@@ -1,0 +1,50 @@
+<td>{{ ticket.type }}</td>
+        <td>{{ ticket.title }}</td>
+        <td>{{ ticket.space }}</td>
+        <td>{{ ticket.project }}</td>
+        <td>{{ ticket.vcs_tag }}</td>
+        <td>{% if ticket.audit_user %}
+                {{ ticket.audit_user.chinese_name }}
+                {% if ticket.audited_at %}
+                    {% if ticket.status == 12 %}
+                        <i class="fas fa-times-circle text-danger"></i>
+                    {% else %}
+                        <i class="fas fa-check-circle text-success"></i>
+                    {% endif %}
+                {% else %}
+                    <i class="fas fa-clock text-warning"></i>
+                {% endif %}
+            {% else %}
+                /
+            {% endif %}
+        </td>
+        <td>{% if ticket.execute_user %}
+                {{ ticket.execute_user.chinese_name }}
+                {% if ticket.executed_at %}
+                    {% if ticket.status == 22 %}
+                        <i class="fas fa-times-circle text-danger"></i>
+                    {% else %}
+                        <i class="fas fa-check-circle text-success"></i>
+                    {% endif %}
+                {% else %}
+                    <i class="fas fa-clock text-warning"></i>
+                {% endif %}
+            {% else %}
+                /
+            {% endif %}
+        </td>
+        <td>{% if ticket.test_user %}
+                {{ ticket.test_user.chinese_name }}
+                {% if ticket.tested_at %}
+                    {% if ticket.status == 32 %}
+                        <i class="fas fa-times-circle text-danger"></i>
+                    {% else %}
+                        <i class="fas fa-check-circle text-success"></i>
+                    {% endif %}
+                {% else %}
+                    <i class="fas fa-clock text-warning"></i>
+                {% endif %}
+            {% else %}
+                /
+            {% endif %}
+        </td>

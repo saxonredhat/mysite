@@ -1,0 +1,78 @@
+{% extends "form.html" %}
+{% load static %}
+{% block title %}发布计划管理{% endblock %}
+{% block content_header %}发布计划管理{% endblock %}
+{% block content_header_page1 %}主页{% endblock %}
+{% block content_header_page2 %}发布计划管理{% endblock %}
+{% block card_title %}发布计划管理{% endblock %}
+{% block card_title_component %}&nbsp;<button type="button" class="btn btn-success btn-sm"><ion-icon name="person-add"></ion-icon> 新增</button>{% endblock %}
+{% block form %}
+    <!-- form start -->
+    <form method="post" role="form" action="">
+        {% csrf_token %}
+        <div class="card-body">
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="title">{{ form.name.label }}:</label>
+                {{ form.name }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="title">{{ form.project.label }}:</label>
+                {{ form.project }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="title">{{ form.service.label }}:</label>
+                {{ form.service }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="title">{{ form.job.label }}:</label>
+                {{ form.job }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="title">{{ form.job_type.label }}:</label>
+                {{ form.job_type }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="title">{{ form.created_type.label }}:</label>
+                {{ form.created_type }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="title">{{ form.vcs_tag.label }}:</label>
+                {{ form.vcs_tag }}
+            </div>
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-primary" value="Submit" id="submit" >构建</button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block base_script %}
+    {{ block.super }}
+    <script>
+        $(function (){
+            $.ajax({
+                url: "/deploy/project/tags?service_id="+{{job.service.project.repository.vcs_project_id}},
+                dataType : "json",
+                type: "get",
+                success: function(data){
+                   $("#id_vcs_tag option").remove();
+                   if(data.errno ==0 ){
+                       for(var i=0; i<data.data.length;i++){
+                           if(i == 0 ){
+                               $('#id_vcs_tag').append('<option value="'+data.data[i]+'" selected="selected">'+data.data[i]+'</option>');
+                           }else{
+                               $('#id_vcs_tag').append('<option value="'+data.data[i]+'">'+data.data[i]+'</option>');
+                           }
+                       }
+                   }
+                }
+            });
+        });
+        $("#submit").click(function(){
+            $("#id_name").attr("disabled",false);
+            $("#id_job").attr("disabled",false);
+            $("#id_job_type").attr("disabled",false);
+            $("#id_created_type").attr("disabled",false);
+        });
+    </script>
+{% endblock %}

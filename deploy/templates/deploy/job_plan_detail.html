@@ -1,0 +1,126 @@
+{% extends "table.html" %}
+{% load static %}
+{% load spacify %}
+{% load readmore %}
+{% block title %}发布计划详情{% endblock %}
+{% block content_header %}发布计划详情{% endblock %}
+{% block content_header_page1 %}主页{% endblock %}
+{% block content_header_page2 %}发布计划详情{% endblock %}
+{% block card_title %}发布计划详情{% endblock %}
+{% block card_body %}
+  <table id="example2" class="table table-bordered table-hover">
+    <tbody>
+    <tr>
+        <td>发布计划名</td>
+        <td>{{ object.name }}
+            <i class="fas fa-copy copy swalDefaultSuccess" style="cursor: pointer;"
+               data-clipboard-text='{{ object.name }}'></i>
+        </td>
+    </tr>
+    <tr>
+        <td>发布名</td>
+        <td>{{ object.job }}</td>
+    </tr>
+    <tr>
+        <td>空间</td>
+        <td>{{ object.job.space }}</td>
+    </tr>
+    <tr>
+        <td>项目名</td>
+        <td>{{ object.job.service.project }}</td>
+    </tr>
+    <tr>
+        <td>服务名</td>
+        <td>{{ object.job.service }}</td>
+    </tr>
+    <tr>
+        <td>分支或标签版本号</td>
+        <td>{{ object.vcs_tag }}</td>
+    </tr>
+    <tr>
+        <td>执行人</td>
+        <td>{{ object.execute_user }}</td>
+    </tr>
+    <tr>
+        <td>发布方式</td>
+        <td>{{ object.get_job_type_name }}</td>
+    </tr>
+    <tr>
+        <td>创建类型</td>
+        <td>{{ object.get_created_type_name }}</td>
+    </tr>
+    <tr>
+        <td>jenkins构建号</td>
+        <td>{{ object.jenkins_build_number }}</td>
+    </tr>
+    <tr>
+        <td>构建时长</td>
+        <td>{% widthratio object.duration 1000.0 1%}秒</td>
+    </tr>
+    <tr>
+        <td>构建结果</td>
+        <td>{% include 'deploy/job_plan_status_btn.html' with job_plan=object %}</td>
+    </tr>
+    <tr>
+        <td>构建详情</td>
+        <td><button type="button" class="btn btn-sm btn-primary" id="console_output" data-toggle="modal" data-target="#modal-xl" ><ion-icon name="search"></ion-icon>查看</button></td>
+    </tr>
+    <tr>
+        <td>完成时间</td>
+        <td>{{ object.finished_at |date:"Y年m月d日 H时i分s秒"}}</td>
+    </tr>
+    <tr>
+        <td>创建时间</td>
+        <td>{{ object.created_at |date:"Y年m月d日 H时i分s秒"}}</td>
+    </tr>
+    </tbody>
+  </table>
+{% endblock %}
+
+{% block modal %}
+<div class="modal fade" id="modal-xl">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="model_title">console输出</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <text id="modal_content">
+              {{ object.console_output|linebreaksbr|spacify }}
+          </text>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+{% endblock %}
+
+{% block base_script %}
+    {{ block.super }}
+    <script>
+    $(function () {
+        new Clipboard('.copy');
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 1000
+        });
+        $('.swalDefaultSuccess').click(function () {
+            Toast.fire({
+                icon: 'success',
+                title: '已复制到粘贴板.'
+            })
+        });
+    });
+    $("#console_output").click(function(){
+        $("#modal_content").html(result.replace(/(?:\r\n|\r|\n)/g, '<br>').replace(/ /g,'\u00a0'));
+    });
+    </script>
+{% endblock %}
+

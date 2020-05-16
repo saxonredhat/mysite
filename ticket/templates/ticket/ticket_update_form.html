@@ -1,0 +1,152 @@
+{% extends "form.html" %}
+{% load static %}
+{% block title %}工单管理{% endblock %}
+{% block content_header %}工单管理{% endblock %}
+{% block content_header_page1 %}主页{% endblock %}
+{% block content_header_page2 %}工单管理{% endblock %}
+{% block card_title %}工单管理{% endblock %}
+{% block form %}
+    <!-- form start -->
+    <form method="post" role="form" enctype="multipart/form-data" action="">
+        {% csrf_token %}
+        <div class="card-body">
+            <div class="form-group" style="display: none" >
+                {{ form.number }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="type">{{ form.type.label }}:</label>
+                {{ form.type }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="title">{{ form.title.label }}:</label>
+                {{ form.title }}
+            </div>
+             <div class="form-group">
+                <label class="control-label col-xs-1" for="space">{{ form.space.label }}:</label>
+                {{ form.space }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="service">{{ form.service.label }}:</label>
+                {{ form.service }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="vcs_tag">{{ form.vcs_tag.label }}:</label>
+                {{ form.vcs_tag }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="audit_user">{{ form.audit_user.label }}:</label>
+                {{ form.audit_user }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="execute_user">{{ form.execute_user.label }}:</label>
+                {{ form.execute_user }}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="audit_user">{{ form.test_user.label }}:</label>
+                {{ form.test_user }}
+            </div>
+            {% if ticket.service_conf %}
+                <div class="form-group">
+                    <label class="control-label col-xs-1" for="service_conf">{{ form.service_conf.label }}:</label>
+                    {{ form.service_conf }}
+                </div>
+            {% endif %}
+            {% if ticket.db_conf %}
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="db_conf">{{ form.db_conf.label }}:</label>
+                {{ form.db_conf }}
+            </div>
+            {% endif %}
+            {% if ticket.db_file %}
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="db_file">{{ form.db_file.label }}:</label>
+                <button type="button" class="btn btn-success" id="btn_db_file" data-toggle="modal" data-target="#modal-xl" >{{ ticket.db_file }}</button>
+                <a type="button" class="btn btn-primary" id="btn_db_file" href="/media/{{ ticket.db_file }}" >下载</a>
+            </div>
+            {% endif %}
+            {% if ticket.other_conf %}
+            <div class="form-group">
+                <label class="control-label col-xs-1" for="other_conf">{{ form.other_conf.label }}:</label>
+                {{ form.other_conf }}
+            </div>
+            {% endif %}
+            <div class="form-group" style="display: {% if ticket_type == 'Audit' %}display{% else %}none{% endif %}">
+                <label class="control-label col-xs-1" for="audit_description">{{ form.audit_description.label }}:</label>
+                {{ form.audit_description }}
+            </div>
+            <div class="form-group" style="display: {% if ticket_type == 'Execute' %}display{% else %}none{% endif %}">
+                <label class="control-label col-xs-1" for="execute_description">{{ form.execute_description.label }}:</label>
+                {{ form.execute_description }}
+            </div>
+            <div class="form-group" style="display: {% if ticket_type == 'Test' %}display{% else %}none{% endif %}">
+                <label class="control-label col-xs-1" for="test_description">{{ form.test_description.label }}:</label>
+                {{ form.test_description }}
+            </div>
+            <div class="form-group" style="display: {% if ticket_type == 'Cancel' %}display{% else %}none{% endif %}">
+                <label class="control-label col-xs-1" for="test_description">{{ form.cancel_description.label }}:</label>
+                {{ form.cancel_description }}
+            </div>
+            <div class="form-group" style="display: {% if ticket_type == 'Execute' %}none{% else %}display{% endif %}">
+                {{ form.status }}
+            </div>
+            <div class="form-group" style="display: none">
+                {{ form.created_at }}
+            </div>
+            <div class="form-group" style="display: none">
+                {{ form.audited_at }}
+            </div>
+            <div class="form-group" style="display: none">
+                {{ form.executed_at }}
+            </div>
+            <div class="form-group" style="display: none">
+                {{ form.tested_at }}
+            </div>
+            <div class="form-group" style="display: none">
+                {{ form.create_user }}
+            </div>
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-primary" value="Submit" id="submit" >提交</button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block modal %}
+    {% include 'ticket/ticket_modal.html' %}
+{% endblock %}
+
+{% block base_script %}
+    {{block.super}}
+    <!-- SweetAlert2 -->
+    <script src="{% static "sys_mgr/plugins/sweetalert2/sweetalert2.min.js"  %}"></script>
+    <!-- Toastr -->
+    <script src="{% static "sys_mgr/plugins/toastr/toastr.min.js"  %}"></script>
+    <script>
+        $("#btn_db_file").click(function(){
+          $.ajax({
+              url: "/media/{{ ticket.db_file }}",
+              success: function(result,status,request){
+                  $("#model_title").html("{{ ticket.db_file }}");
+                  contentsize = request.getResponseHeader("Content-Length") /1024/1024;
+                  if(contentsize>1){
+                      $("#modal_content").html("文件内容超过1M不支持预览，请下载！");
+                  }else{
+                      $("#modal_content").html(result.replace(/(?:\r\n|\r|\n)/g, '<br>').replace(/ /g,'\u00a0'));
+                  }
+          }});
+        });
+        $("#submit").click(function(){
+            $("#id_type").attr("disabled",false);
+            $("#id_title").attr("disabled",false);
+            $("#id_space").attr("disabled",false);
+            $("#id_service").attr("disabled",false);
+            $("#id_vcs_tag").attr("disabled",false);
+            $("#id_audit_user").attr("disabled",false);
+            $("#id_execute_user").attr("disabled",false);
+            $("#id_test_user").attr("disabled",false);
+            $("#id_service_conf").attr("disabled",false);
+            $("#id_db_conf").attr("disabled",false);
+            $("#id_other_conf").attr("disabled",false);
+        });
+    </script>
+{% endblock %}

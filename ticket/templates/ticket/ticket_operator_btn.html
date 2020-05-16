@@ -1,0 +1,15 @@
+{% if btn_type == 'detail' %}
+    <a class="btn btn-primary btn-sm" href="{% url "ticket:detail" ticket.id %}"><ion-icon name="information-circle"></ion-icon> 详情</a>
+{% elif btn_type == 'update' %}
+    <a class="btn btn-success btn-sm" href="{% url "ticket:update" ticket.id %}"><ion-icon name="create"></ion-icon> 更新</a>
+{% elif btn_type == 'delete' %}
+    <a class="btn btn-danger btn-sm" href="{% url "ticket:delete" ticket.id %}"><ion-icon name="close-circle"></ion-icon> 删除</a>
+{% elif btn_type == 'cancel' %}
+    <a class="btn btn-danger btn-sm" href="{% url "ticket:cancel" ticket.id %}"><ion-icon name="close-circle"></ion-icon> 作废</a>
+{% elif btn_type == 'audit' %}
+    <a class="btn btn-primary btn-sm" href="{% url "ticket:audit" ticket.id %}">审核</a>
+{% elif btn_type == 'execute' %}
+    <a class="btn btn-primary btn-sm" href="{% url "ticket:execute" ticket.id %}">发布</a>
+{% elif btn_type == 'test' %}
+    <a class="btn btn-primary btn-sm" href="{% url "ticket:test" ticket.id %}">测试</a>
+{% endif %}

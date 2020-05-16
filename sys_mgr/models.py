@@ -12,7 +12,7 @@ class User(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 
 	def __str__(self):
-		return "{0}({1})".format(self.username, self.chinese_name)
+		return self.chinese_name if self.chinese_name else self.username
 
 	def get_perm_url_list(self):
 		_perm_url_list=[]

@@ -1,0 +1,127 @@
+{% extends "base_list.html" %}
+{% load static %}
+{% block title %}发布列表{% endblock %}
+{% block base_css %}
+    {{ block.super }}
+    <style type="text/css">
+        .m-con {
+            margin: 20px;
+        }
+
+        .m-text {
+            font-size: 16px;
+            padding-top:15px;
+            font-weight:bold;
+        }
+
+        .m-con td {
+            vertical-align:middle !important;
+        }
+
+        @media screen and (max-width:765px) {
+            .m-row > div {
+                text-align:center;
+            }
+        }
+    </style>
+{% endblock %}
+{% block content_header %}发布列表{% endblock %}
+{% block content_header_page1 %}主页{% endblock %}
+{% block content_header_page2 %}发布列表{% endblock %}
+{% block card_title %}发布列表{% endblock %}
+{% block card_body %}
+  <table class="table table-bordered table-hover datatable-pagination">
+    <thead>
+    <tr>
+      {% include 'deploy/job_table.html' with table_type='table_header' %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for job in jobs %}
+    <tr>
+        {% include 'deploy/job_table.html' with table_type='table_body' job=job %}
+        <td>
+            {% include 'deploy/job_status_btn.html' with job=job %}
+        </td>
+        <td>
+            {% include 'deploy/job_operator_btn.html' with btn_type='job_plan_add' job=job %}
+            {% include 'deploy/job_operator_btn.html' with btn_type='job_update' job=job %}
+            {% if current_user == job.create_user %}
+                {% include 'deploy/job_operator_btn.html' with btn_type='job_delete' job=job %}
+            {% endif %}
+            {% include 'deploy/job_operator_btn.html' with btn_type='job_history' job=job %}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+
+{% block base_script %}
+    {{ block.super }}
+    <script>
+        $(function (){
+            get_job_progress();
+            //配置定时器获取进度
+            t = setInterval("get_job_progress()", 2000);
+            //配置分页
+            $('.datatable-pagination').DataTable({
+              "order": [[1,'desc']],
+              "paging": true,
+              "lengthChange": false,
+              "searching": true,
+              "ordering": true,
+              "info": true,
+              "autoWidth": false,
+              "responsive": true,
+              "oLanguage": {
+                  "sLengthMenu": "每页显示 _MENU_ 条记录",
+                  "sZeroRecords": "对不起，查询不到任何相关数据",
+                  "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录",
+                  "sInfoEmtpy": "找不到相关数据",
+                  "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                  "sProcessing": "正在加载中...",
+                  "sSearch": "搜索",
+                  "sUrl": "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                  "oPaginate": {
+                      "sFirst":    "第一页",
+                      "sPrevious": " 上一页 ",
+                      "sNext":     " 下一页 ",
+                      "sLast":     " 最后一页 "
+                  }
+              }, //多语言配置
+            });
+        });
+        //获取发布进度的函数
+        function get_job_progress() {
+            $.ajax({
+                url: "/deploy/job/progress",
+                dataType : "json",
+                type: "get",
+                success: function(data){
+                   if(data.errno ==0 ){
+                       for(var i=0; i<data.data.length;i++){
+                           job_info = data.data[i];
+                           console.log(job_info['progress'])
+                           console.log(job_info['progress'] == "100")
+                           if(job_info['progress'] == "100"){
+                               $("#id_job_btn_"+job_info["job_id"]).show();
+                               $("#id_job_progress_"+job_info["job_id"]).hide();
+                                $("#id_job_btn_"+job_info["job_id"]).text("空闲");
+                                $("#id_build_btn_"+job_info["job_id"]).hide();
+                                $("#id_build_active_btn_"+job_info["job_id"]).show();
+
+                           }else {
+                               $("#id_job_btn_"+job_info["job_id"]).hide();
+                               $("#id_job_progress_"+job_info["job_id"]).show();
+                               $("#id_job_progressbar_"+job_info["job_id"]).css("width",job_info["progress"]+"%");
+                               $("#id_build_btn_"+job_info["job_id"]).show();
+                               $("#id_build_active_btn_"+job_info["job_id"]).hide();
+                           }
+                       }
+                   }
+                }
+            });
+        }
+    </script>
+{% endblock %}

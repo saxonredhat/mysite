@@ -27,6 +27,10 @@
   <link rel="stylesheet" href="{% static "sys_mgr/plugins/daterangepicker/daterangepicker.css"  %}">
   <!-- summernote -->
   <link rel="stylesheet" href="{% static "sys_mgr/plugins/summernote/summernote-bs4.css"  %}">
+    <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="{% static "sys_mgr/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css"  %}">
+  <!-- Toastr -->
+  <link rel="stylesheet" href="{% static "sys_mgr//plugins/toastr/toastr.min.css"  %}">
   {% endblock %}
 
 </head>
@@ -214,6 +218,8 @@
       {% block content %}
       base content
       {% endblock %}
+      {% block modal %}
+      {% endblock %}
     </section>
     <!-- /.content -->
   </div>
@@ -275,6 +281,7 @@
 <script src="{% static "sys_mgr/dist/js/demo.js"  %}"></script>
 
 <script src="https://unpkg.com/ionicons@5.0.0/dist/ionicons.js"></script>
+<script src="https://cdn.bootcss.com/clipboard.js/1.7.1/clipboard.js"></script>
 
 {% endblock %}
 </body>

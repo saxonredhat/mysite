@@ -1,0 +1,78 @@
+{% if table_type == 'table_header' %}
+    <th>工单编号</th>
+    <th>工单类型</th>
+    <th>标题</th>
+    <th>空间</th>
+    <th>服务名</th>
+    <th>标签版本号</th>
+    <th>创建人</th>
+    <th>审核人</th>
+    <th>执行人</th>
+    <th>测试人</th>
+    <th>创建时间</th>
+    <th>状态</th>
+    <th>操作</th>
+{% elif  table_type == 'table_body' %}
+    <td><i>{{ ticket.number }}</i> <i class="fas fa-copy copy swalDefaultSuccess" style="cursor: pointer;"
+ data-clipboard-text='{{ ticket.number }}'></i></td>
+    <td>{{ ticket.type }}</td>
+    <td>{{ ticket.title }}</td>
+    <td>{{ ticket.space }}</td>
+    <td>{{ ticket.service }}</td>
+    <td>
+        {% if ticket.vcs_tag %}
+            {{ ticket.vcs_tag }}
+        {% else %}
+            /
+        {% endif %}
+    </td>
+    <td>
+        <i class="fas fa-check-circle text-success"></i>
+        {{ ticket.create_user }}
+    </td>
+    <td>
+        {% if ticket.audit_user %}
+            {% if ticket.audited_at %}
+                <i class="fas fa-check-circle text-success"></i>
+            {% else %}
+                <i class="fas fa-clock text-warning"></i>
+            {% endif %}
+            {{ ticket.audit_user }}
+        {% else %}
+            /
+        {% endif %}
+    </td>
+    <td>
+        {% if ticket.execute_user %}
+            {% if ticket.executed_at %}
+                <i class="fas fa-check-circle text-success"></i>
+            {% else %}
+                <i class="fas fa-clock text-warning"></i>
+            {% endif %}
+            {% if ticket.status == 12 %}
+                <del>{{ ticket.execute_user }}</del>
+            {% else %}
+                {{ ticket.execute_user }}
+            {% endif %}
+        {% else %}
+            /
+        {% endif %}
+    </td>
+    <td>
+        {% if ticket.test_user %}
+            {% if ticket.tested_at %}
+                <i class="fas fa-check-circle text-success"></i>
+            {% else %}
+                <i class="fas fa-clock text-warning"></i>
+            {% endif %}
+            {% if ticket.status == 12 %}
+                <del>{{ ticket.test_user }}</del>
+            {% else %}
+                {{ ticket.test_user }}
+            {% endif %}
+        {% else %}
+            /
+        {% endif %}
+    </td>
+    <td>{{ ticket.created_at |date:"Y-m-d H:i:s"}}</td>
+{% endif %}
