@@ -4,3 +4,4 @@ from .models import *
 
 admin.site.register(Ticket)
 admin.site.register(TicketType)
+admin.site.register(TicketBindInfo)

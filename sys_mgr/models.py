@@ -92,9 +92,10 @@ class Menu(models.Model):
 
 class Space(models.Model):
 	name = models.CharField(max_length=64)
+	code = models.CharField(max_length=64, unique=False, default="")
 
 	def __str__(self):
-		return self.name
+		return "{0}({1})".format(self.name,self.code)
 
 	class Meta:
 		verbose_name = u"空间"

@@ -9,7 +9,7 @@
 
 {% elif btn_type == 'job_history' %}
     <a class="btn btn-info btn-sm" href="{% url "deploy:job_plan_list" job.id %}">
-        <ion-icon name="recording"></ion-icon> 历史记录</a>
+        <ion-icon name="recording"></ion-icon> 发布历史</a>
 {% elif btn_type == 'job_update' %}
     <a class="btn btn-success btn-sm" href="{% url "deploy:job_update" job.id %}">
         <ion-icon name="create"></ion-icon> 更新</a>

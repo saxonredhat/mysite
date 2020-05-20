@@ -66,6 +66,10 @@
                 <label class="control-label col-xs-1" for="status">{{ form.status.label }}:</label>
                 {{ form.status }}
             </div>
+            <div class="form-group" style="display: none">
+                <label class="control-label col-xs-1" for="status">{{ form.parent.label }}:</label>
+                {{ form.parent }}
+            </div>
         </div>
         <div class="card-footer">
             <button type="submit" class="btn btn-primary" value="Submit" id="submit" >提交</button>
@@ -79,6 +83,7 @@
     <script>
         $(document).ready(function () {
           bsCustomFileInput.init();
+          update_user_info();
         });
         function update_user_info(){
             //获取空间
@@ -103,12 +108,15 @@
                            $("#id_execute_user option").remove();
                            $("#id_test_user option").remove();
                            for(var i=0; i<data.data.audit_users_list.length;i++){
+                                console.log("audit"+i);
                                 $('#id_audit_user').append('<option value="'+data.data.audit_users_list[i]['audit_user_id']+'">'+data.data.audit_users_list[i]['audit_user_name']+'</option>');
                             }
                             for(var i=0; i<data.data.execute_users_list.length;i++){
+                                console.log("execute"+i);
                                 $('#id_execute_user').append('<option value="'+data.data.execute_users_list[i]['execute_user_id']+'">'+data.data.execute_users_list[i]['execute_user_name']+'</option>');
                             }
                             for(var i=0; i<data.data.test_users_list.length;i++){
+                                console.log("test"+i);
                                 $('#id_test_user').append('<option value="'+data.data.test_users_list[i]['test_user_id']+'">'+data.data.test_users_list[i]['test_user_name']+'</option>');
                             }
                            if(data.data.bind == 0 ){
@@ -128,44 +136,6 @@
                 });
             }
         }
-        function update_vcs_tag(){
-            var ticket_type=$("#id_type").children(":selected").text();
-            var service_id=$("#id_service").children(":selected").attr("value");
-            if(ticket_type != "业务服务"){
-                $("#id_vcs_tag option").remove();
-                $("#id_vcs_tag").attr("disabled",true);
-            }else{
-                $("#id_vcs_tag").attr("disabled",false);
-                $.ajax({
-                    url: "/deploy/project/tags?service_id="+service_id,
-                    dataType : "json",
-                    type: "get",
-                    success: function(data){
-                       $("#id_vcs_tag option").remove();
-                       if(data.errno ==0 ){
-                           for(var i=0; i<data.data.length;i++){
-                               if(i == 0 ){
-                                   $('#id_vcs_tag').append('<option value="'+data.data[i]+'" selected="selected">'+data.data[i]+'</option>');
-                               }else{
-                                   $('#id_vcs_tag').append('<option value="'+data.data[i]+'">'+data.data[i]+'</option>');
-                               }
-                           }
-                       }
-                    }
-                });
-            }
-        }
-        $('#id_type').change(function(){
-            update_vcs_tag();
-            update_user_info();
-        });
-        $('#id_space').change(function () {
-            update_user_info();
-        });
-        $('#id_service').change(function(){
-            update_vcs_tag();
-            update_user_info();
-        });
     </script>
     <script>
         $("#submit").click(function(){

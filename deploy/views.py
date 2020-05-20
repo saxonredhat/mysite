@@ -31,6 +31,7 @@ class ProjectTagsView(View):
         try:
             service = Service.objects.get(id=service_id)
         except Exception as e:
+            print(e)
             service = None
         if not service:
             return JsonResponse({'errno': -1, 'errmsg': 'id error', 'data': {}}, safe=False)
@@ -50,6 +51,7 @@ class ProjectTagsView(View):
             url="http://{0}/api/v4/projects/{1}/repository/branches?private_token={2}".format(git_host, project_id,
                                                                                           private_token))
         reps = response.read().decode("utf-8")
+        print(reps)
         branches_json = json.loads(reps)
         branches_list = []
         for branch in branches_json[:30]:
@@ -76,14 +78,17 @@ class GetAllJobsProgress(View):
                         total_seconds += job_plan.duration/1000.0
                     average_seconds = total_seconds / 2
                     average_seconds = 60 if average_seconds == 0 else average_seconds
-                    estimate_progress = last_job_plan_duration_seconds / average_seconds * 0.5 * 100
+                    estimate_progress = last_job_plan_duration_seconds / average_seconds * 0.8 * 100
                 else:
-                    estimate_progress = last_job_plan_duration_seconds * 0.5
+                    estimate_progress = last_job_plan_duration_seconds * 0.8
                 progress = 95 if estimate_progress > 95 else estimate_progress
                 jobs_data_list.append({'job_id': job.id, 'progress': progress})
             #如果在执行，获取最近2次的该job的构建时间取平均值，否则执行时间，通过执行的秒数*5并且如果结果大于95，设置值为95
         return JsonResponse({'errno': 0, 'errmsg': 'ok', 'data': jobs_data_list}, safe=False)
 
+
+def job_plan_build_job():
+    pass
 
 class JobCreateView(CreateView):
     form_class = JobForm
@@ -120,65 +125,49 @@ class JobPlanCreateView(CreateView):
         super(JobPlanCreateView, self).post(request)
         #调用jenkins接口执行升级
         try:
-            jenkins_job = JenkinsJob.objects.get(space=self.object.job.space, service=self.object.job.service)
-            if self.object.job.space.name == '生产':
-                env = 'prod'
-            elif self.object.job.space.name == '预生产':
-                env = 'pre_prod'
-            elif self.object.job.space.name == '测试':
-                env = 'test'
-            elif self.object.job.space.name == '研发':
-                env = 'dev'
-            else:
-                env = 'unknow'
-            last_build_number = get_last_build_number(env, jenkins_job.job_name)
-            #构建job
-            build_job_branch_tag(env, jenkins_job.job_name, self.object.vcs_tag)
+            job_space = self.object.job.space
+            job_service = self.object.job.service
+            jenkins_job = JenkinsJob.objects.get(space=job_space, service=job_service)
+            job_name = jenkins_job.job_name
+            next_build_number = get_next_build_number(job_space, job_name)
+            build_job_branch_tag(job_space, job_name, self.object.vcs_tag)
             # 设置job 的状态为构建中
-            if last_build_number:
-                self.object.jenkins_build_number = last_build_number + 1
+            self.object.jenkins_build_number = next_build_number
+            self.object.save()
             self.object.job.status = 1
             self.object.job.save()
-            _thread.start_new_thread(self.update_job_info, (env, jenkins_job.job_name))
+            _thread.start_new_thread(self.update_job_plan, (job_space, job_name))
             message = "发布中"
         except Exception as e:
             message = "发布异常"
         return redirect(reverse("deploy:job_list"))
 
-    def update_job_info(self, space, job_name):
+    def update_job_plan(self, space, job_name):
         # 设置job默认为失败
-        self.object.status = 2
         _start_count = 0
-        last_build_number = get_last_build_number(space, job_name)
-        while _start_count < 600:
-            if not self.object.jenkins_build_number and not last_build_number:
-                time.sleep(1)
-                last_build_number=get_last_build_number(space, job_name)
-            else:
-                if last_build_number:
-                    if get_job_build_result(space, job_name, last_build_number) == 'SUCCESS':
-                        self.object.status = 1
-                        break
-                    elif get_job_build_result(space, job_name, last_build_number) == 'FAILURE':
-                        self.object.status = 2
-                        break
-                else:
-                    if get_job_build_result(space, job_name, self.object.jenkins_build_number) == 'SUCCESS':
-                        self.object.status = 1
-                        break
-                    elif get_job_build_result(space, job_name, self.object.jenkins_build_number) == 'FAILURE':
-                        self.object.status = 2
-                        break
-            _start_count += 1
+        while _start_count < 180:
+            job_build_result = get_job_build_result(space, job_name, self.object.jenkins_build_number)
+            if job_build_result == 'SUCCESS':
+                self.object.status = 1
+                break
+            elif job_build_result == 'FAILURE':
+                self.object.status = 2
+                break
             time.sleep(1)
+            _start_count += 1
 
-        if _start_count >= 600:
-            self.object.status = 3
+        if _start_count >= 180:
+            return
         # 更新job_plan的状态
         self.object.finished_at = timezone.now()
-        self.object.duration = get_job_build_info(space, job_name, self.object.jenkins_build_number)['duration']
+        duration = get_job_build_info(space, job_name, self.object.jenkins_build_number)['duration']
+        self.object.duration = duration if duration != 0 else 22
         self.object.console_output = get_job_build_console_output(space, job_name, self.object.jenkins_build_number)
         self.object.save()
+        if self.object.ticket:
+            print("准备保存ticket")
+            self.object.ticket.execute_update()
+            self.object.ticket.save()
         # 更新job的状态
         self.object.job.status = 0
         self.object.job.save()
@@ -300,24 +289,39 @@ try:
     # @register_job(scheduler, 'cron', day_of_week='mon-fri', hour='9', minute='30', second='10',id='task_time')
     @register_job(scheduler,"interval", seconds=10)
     def update_job_plan_status_job():
-        print("定时器OK")
+        #print("update_job_plan_status_job定时器执行")
         # 获取所有job_plan为进行中的状态
         for job_plan in JobPlan.objects.filter(status=0):
-            jenkins_job = JenkinsJob.objects.get(space=job_plan.job.space, service=job_plan.job.service)
-            job_build_info=get_job_build_info(job_plan.job.space, jenkins_job.job_name, job_plan.jenkins_build_number)
-            print(job_build_info)
-            result = job_build_info['result']
+            space = job_plan.job.space
+            service = job_plan.job.service
+            jenkins_build_number = job_plan.jenkins_build_number
+            #print(space,service)
+            try:
+                jenkins_job = JenkinsJob.objects.get(space=space, service=service)
+                job_name = jenkins_job.job_name
+            except Exception as e:
+                print("jenkins_job获取异常:{0}".format(e))
+                continue
+            result = get_job_build_result(space, job_name, jenkins_build_number)
             if result:
                 #更新job_plan
                 if result == 'SUCCESS':
                     job_plan.status = 1
                 elif result == 'FAILURE':
                     job_plan.status = 2
+                else:
+                    continue
                 #完成时间
+                #print(get_job_build_info(space, job_name, jenkins_build_number)['duration'])
+                duration = get_job_build_info(space, job_name, jenkins_build_number)['duration']
+                job_plan.duration = duration if duration != 0 else 22
                 duration_seconds = job_plan.duration / 1000.0
                 job_plan.finished_at = job_plan.created_at + timezone.timedelta(seconds=duration_seconds)
-                job_plan.console_output = get_job_build_console_output(job_plan.job.space, jenkins_job.job_name, job_plan.jenkins_build_number)
+                job_plan.console_output = get_job_build_console_output(space, job_name, jenkins_build_number)
                 job_plan.save()
+                if job_plan.ticket:
+                    job_plan.ticket.execute_update_info()
+                    job_plan.ticket.save()
                 #更新job
                 job_plan.job.status = 0
                 job_plan.job.save()

@@ -1,4 +1,4 @@
-<button class="btn btn-success btn-sm" style="display: {% if job.status == 0 %} display {% else %} none {% endif %}" id="id_job_btn_{{job.id}}">{{job.get_status_name}}</button>
+<button class="btn btn-dark btn-sm" style="display: {% if job.status == 0 %} display {% else %} none {% endif %}" id="id_job_btn_{{job.id}}">{{job.get_status_name}}</button>
 <div class="progress mb-3" id="id_job_progress_{{job.id}}" style="display: {% if job.status != 0 %} display {% else %} none {% endif %}">
   <div class="progress-bar bg-success" role="progressbar" id="id_job_progressbar_{{job.id}}" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">
   </div>

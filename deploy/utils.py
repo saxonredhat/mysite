@@ -4,10 +4,14 @@ from mysite.settings import JENKINS_PROD_URL,JENKINS_PROD_PASS,JENKINS_PROD_USER
 
 
 def get_server_instance(space):
-	if space == 'prod':
+	if space.code == 'PROD':
 		jenkins_url = JENKINS_PROD_URL
 		jenkins_user = JENKINS_PROD_USER
 		jenkins_pass = JENKINS_PROD_PASS
+	elif space.code == 'TEST':
+		jenkins_url = JENKINS_TEST_URL
+		jenkins_user = JENKINS_TEST_USER
+		jenkins_pass = JENKINS_TEST_PASS
 	else:
 		jenkins_url = JENKINS_TEST_URL
 		jenkins_user = JENKINS_TEST_USER
@@ -38,6 +42,15 @@ def get_last_build_number(space, job_name):
 		server = get_server_instance(space)
 		last_build_number = server.get_job_info(job_name)['lastCompletedBuild']['number']
 		return last_build_number
+	except Exception as e:
+		return None
+
+
+def get_next_build_number(space, job_name):
+	try:
+		server = get_server_instance(space)
+		next_build_number = server.get_job_info(job_name)['nextBuildNumber']
+		return next_build_number
 	except Exception as e:
 		return None
 

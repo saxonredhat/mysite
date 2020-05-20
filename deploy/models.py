@@ -22,7 +22,7 @@ class Service(models.Model):
 	project = models.ForeignKey("Project", verbose_name="项目", on_delete=models.CASCADE, related_name='services')
 
 	def __str__(self):
-		return "{0}({1})".format(self.project.name, self.name)
+		return "{0}({1})".format(self.name, self.project.name)
 
 	class Meta:
 		verbose_name = u"服务"
@@ -84,14 +84,15 @@ class JobPlan(models.Model):
 	name = models.CharField("发布计划名", max_length=64, unique=True)
 	job = models.ForeignKey("Job", verbose_name="发布", on_delete=models.CASCADE, related_name='job_plans')
 	ticket = models.ForeignKey("ticket.Ticket", verbose_name="关联工单", on_delete=models.CASCADE,
-	                           related_name='job_tasks', blank=True, null=True)
+	                           related_name='job_plans', blank=True, null=True)
 	vcs_tag = models.CharField("分支或标签", max_length=256, blank=True, null=True)
 	execute_user = models.ForeignKey("sys_mgr.User", verbose_name="执行人员", on_delete=models.CASCADE,
-	                                 related_name='job_tasks', blank=True, null=True)
+	                                 related_name='job_plans', blank=True, null=True)
 	job_type = models.SmallIntegerField("发布方式", choices=JOB_TYPE, blank=True, default=0)
 	created_type = models.SmallIntegerField("创建类型", choices=CREATED_TYPE, blank=True, default=0)
-	duration = models.IntegerField("构建时间", default=0, blank=True, null=True)
+	duration = models.IntegerField("构建时长", default=0, blank=True, null=True)
 	jenkins_build_number = models.IntegerField("jenkins构建号", blank=True, null=True)
+	#jenkins_job = models.ForeignKey("JenkinsJob", verbose_name="jenkins构建Job对象", blank=True, null=True)
 	status = models.SmallIntegerField("结果", blank=True, default=0)
 	detail_description = models.TextField("发布计划详情", blank=True, null=True)
 	console_output = models.TextField("发布console信息", blank=True, null=True)

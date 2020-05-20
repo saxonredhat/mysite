@@ -13,9 +13,9 @@ def get_server_instance():
 	return server
 
 
-def build_job(space, job_name):
+def build_job(job_name):
 	try:
-		server = get_server_instance(space)
+		server = get_server_instance()
 		server.build_job(job_name)
 	except Exception as e:
 		print(e)
@@ -30,9 +30,9 @@ def get_job_build_result(space, job_name, build_number):
 		return None
 
 
-def get_last_build_number(space, job_name):
+def get_last_build_number(job_name):
 	try:
-		server = get_server_instance(space)
+		server = get_server_instance()
 		last_build_number = server.get_job_info(job_name)['lastCompletedBuild']['number']
 		return last_build_number
 	except Exception as e:
@@ -47,9 +47,20 @@ def get_job_build_info(job_name, build_number):
 	except Exception as e:
 		return None
 
+
+job_name = 'test-env/tongfen-service_2'
+print(get_last_build_number(job_name))
 server = get_server_instance()
-job_name = 'test-env/sms-service_2'
-print(get_job_build_info(job_name,13))
+#get_last_build_number(job_name)
+print(server.get_build_info(job_name,13)['duration'])
+#print(next_bn)
+#print(server.get_whoami())
+#print(server.get_version())
+#print(server.get_build_info(job_name,35)['result'])
+#server.set_next_build_number(job_name, 28)
+#java -jar jenkins-cli.jar -s http://tjenkins.shudoon.com/ -auth weidalian:11951d21e3d4af90c5a61dd0651abd1d66 -webSocket set-next-build-number test-env/sms-service_2 30
+#print(help(server.set_next_build_number))
+#build_job(job_name,{"branch_tag","refs/tags/v1.1.40"})
 #print(server.get_build_console_output(job_name,23))
 #server.build_job(job_name,{"branch_tag":"*/master"})
 #获取job名为job_name的job的最后次构建号

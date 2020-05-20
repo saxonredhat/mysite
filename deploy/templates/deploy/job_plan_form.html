@@ -51,7 +51,7 @@
     <script>
         $(function (){
             $.ajax({
-                url: "/deploy/project/tags?service_id="+{{job.service.project.repository.vcs_project_id}},
+                url: "/deploy/project/tags?service_id="+{{job.service.id}},
                 dataType : "json",
                 type: "get",
                 success: function(data){

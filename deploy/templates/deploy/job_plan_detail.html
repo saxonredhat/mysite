@@ -37,6 +37,12 @@
         <td>分支或标签版本号</td>
         <td>{{ object.vcs_tag }}</td>
     </tr>
+    {% if object.ticket %}
+        <tr>
+            <td>关联工单</td>
+             <td><a href="{% url "ticket:detail" object.ticket.id %}">{{ object.ticket }}</a></td>
+        </tr>
+    {% endif %}
     <tr>
         <td>执行人</td>
         <td>{{ object.execute_user }}</td>
@@ -82,14 +88,16 @@
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title" id="model_title">console输出</h4>
+          <h4 class="modal-title" id="model_title">构建详情</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
           <text id="modal_content">
-              {{ object.console_output|linebreaksbr|spacify }}
+              {% if object.console_output %}
+                {{ object.console_output|linebreaksbr|spacify }}
+              {% endif %}
           </text>
         </div>
       </div>
